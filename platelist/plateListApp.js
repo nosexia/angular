@@ -32,7 +32,7 @@ define([
                         return plateEditLoader($route.current.params.tid);
                     }],
 
-                    dataChengList: ["$route", "ChengListLoader" , function($route, ChengListLoader){
+                    dataChengList: ["$route", "ChengListLoader" , function($route, ChengListLoader){                                                                                                 
                         return ChengListLoader({tid: $route.current.params.tid});
                     }],
 

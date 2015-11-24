@@ -6,9 +6,13 @@
     <script type="text/javascript" src='scripts/angular.min.js'></script>
 </head>
 <body>    
-    <input type="checkbox" name='chance1'  ng-model='checkboxValue' value='6' >    
-    {{checkboxValue}}
+   <select ng-init="fruit='苹果'" ng-model='fruit'>
+       <option value='苹果' >苹果</option>
+       <option value='香蕉' >香蕉</option>
+       <option value='例子' >例子</option>
+   </select>
+   {{fruit}}
 
-    <!--复选框ng-model的对应的变量值，为true, false-->
+   <!--select下拉框， ng-model对应变量值为option值-->
 </body>
 </html

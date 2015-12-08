@@ -5,13 +5,11 @@ define([
     'controller/listController',
     'angular-route'
 ],function(angular, controllerModule, detailController, listController, ngRoute){
-    //myApp模块依赖ngRoute模块
    var myApp = angular.module('myApp', ['controllerModule', 'ngRoute']);
-   //注入内置服务$httpProvider
-   myApp.config(['$httpProvider', function($httpProvider){
-        
+   //$routeProvider属于ngRoute模块的一个服务
+   //注入routeProvider服务到myApp模块中
+   myApp.config(['$httpProvider', '$routeProvider',  function($httpProvider, $routeProvider){
+        console.log($routeProvider);
    }]); 
-   console.log(myApp);
-   //配置路由
    return myApp; 
 });

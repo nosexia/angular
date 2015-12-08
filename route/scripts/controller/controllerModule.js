@@ -1,6 +1,6 @@
-require([
+define([
     'angular',
 ],function(angular){
-    //var controllerModule = angular.module('controllerModule', []);
-    //return controllerModule;
+    var controllerModule = angular.module('controllerModule', []);
+    return controllerModule;
 });

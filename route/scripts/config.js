@@ -1,11 +1,14 @@
 var require = {
     baseUrl: 'scripts',
-    path: {
-        angular: 'angular.js',
+    paths: {
+        angular: 'angular',
+        'angular-route': 'angular-route.min'
     },
     shim: {
         angular:{
             exports: 'angular'
-        }
+        },
+        'angular-route': ['angular']
+
     }
 };   

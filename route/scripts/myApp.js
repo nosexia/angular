@@ -2,10 +2,11 @@ define([
     'angular',
     'controller/controllerModule',
     'controller/detailController',
-    'controller/listController'
-],function(angular, controllerModule, detailController, listController){
-    //myApp模块依赖controllerModule模块
-   var myApp = angular.module('myApp', ['controllerModule']);
+    'controller/listController',
+    'angular-route'
+],function(angular, controllerModule, detailController, listController, ngRoute){
+    //myApp模块依赖ngRoute模块
+   var myApp = angular.module('myApp', ['controllerModule', 'ngRoute']);
    //注入内置服务$httpProvider
    myApp.config(['$httpProvider', function($httpProvider){
         

@@ -1,7 +1,5 @@
-require([
-    'angular',
-    'controllerModule'
-],function(angular, controllerModule){
-    //myApp模块依赖controllerModule模块
-    var myApp = angular.module('myApp', ['controllerModule']);
+define([
+    'angular'
+],function(angular){
+    
 });

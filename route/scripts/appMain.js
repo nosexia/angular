@@ -2,5 +2,6 @@ require([
     'angular',
     'myApp'    
 ],function(angular, myApp){  
-    //踩坑：require方法，只在入口appMain中调用
+    //myApp模块解析html中body
+    angular.bootstrap(document.body, ['myApp']);
 });

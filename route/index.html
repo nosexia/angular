@@ -7,18 +7,24 @@
     <script src="scripts/require.js" data-main='appMain'></script>
 </head>
 <body>
-    
+    <!--加入渲染指令ng-view-->
     <div ng-view>
         
     </div> 
 </body>
 <script type="text/ng-template" id='detailTpl'>
-    '内容页'
+    <p>
+        '内容页'    
+    </p>
+    
 </script>
 
 
 <script type="text/ng-template" id='listTpl'>
-    "列表页"
+    <p>
+        "列表页"    
+    </p>
+    
 </script>
 
 </html>

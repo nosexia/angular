@@ -2,11 +2,15 @@ define([
     './directiveModule'
 ],function(module){
     module.directive('myDirective', function(){
-        //参数replace，是否用当前模版，替换当前元素
+        //myName的值，对应字符串"nose"，用'@'
+        //在指令模块下面，声明独立作用域
         return {
             restrict: 'A',
-            template: '<div class="name">nose</div>',
-            replace: true   
+            template: '<div >{{myName}}</div>',
+            replace: true,
+            scope: {
+                myName: '@'         
+            }   
         };
     });
 });

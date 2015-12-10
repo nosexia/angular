@@ -4,6 +4,6 @@ define([
     'directive/myDirective'
 ],function(angular, directiveModule, myDirective){      
     //myApp模块依赖directiveModule模块
-   var myApp = angular.module('myApp', ['directiveModule']);     
+   var myApp = angular.module('myApp', ['directiveModule']); 
    return myApp; 
 });

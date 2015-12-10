@@ -7,9 +7,9 @@
     <script src="scripts/require.js" data-main='appMain'></script>
 </head>
 
-<body>
+<body ng-controller='myController'>
     <!--相当于在指令作用域下，声明变量myName=nose-->
-    <div my-directive my-name="nose"></div>
+    <div my-directive my-name="nose" my-age="myAge" ></div>
 </body>
 
 

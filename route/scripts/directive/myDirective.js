@@ -2,14 +2,15 @@ define([
     './directiveModule'
 ],function(module){
     module.directive('myDirective', function(){
-        //myName的值，对应字符串"nose"，用'@'
+        //myAge的值，指定myControlller作用域中的myAge变量， 用标识符'='
         //在指令模块下面，声明独立作用域
         return {
             restrict: 'A',
-            template: '<div >{{myName}}</div>',
+            template: '<div >{{myName}} || {{myAge}}</div>',
             replace: true,
             scope: {
-                myName: '@'         
+                myName: '@',
+                myAge: '='         
             }   
         };
     });

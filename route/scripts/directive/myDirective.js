@@ -2,7 +2,7 @@ define([
     './directiveModule'
 ],function(module){
     module.directive('myDirective', function(){
-        //myAge的值，指定myControlller作用域中的myAge变量， 用标识符'='
+        //link参数，指令内部实现dom编程
         //在指令模块下面，声明独立作用域
         return {
             restrict: 'A',
@@ -11,6 +11,12 @@ define([
             scope: {
                 myName: '@',
                 myAge: '='         
+            },
+            link: function($scope, element){
+                //element为angular分装的dom对象
+                element.on('click', function(){
+                    alert('1111');
+                })
             }   
         };
     });

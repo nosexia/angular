@@ -1,5 +1,6 @@
 var require = {
     baseUrl: 'scripts',
+    urlArgs: 'v=' + new Date().getTime(),
     paths: {
         angular: 'angular',
         'angular-route': 'angular-route.min'

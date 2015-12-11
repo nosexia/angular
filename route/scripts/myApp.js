@@ -7,6 +7,7 @@ define([
    var myApp = angular.module('myApp', ['directiveModule']); 
    myApp.controller('myController', ['$scope', function($scope){
         $scope.myAge = '23';
+        $scope.isActive = true;
    }]);
    return myApp; 
 });

@@ -8,7 +8,8 @@
 </head>
 
 <body ng-controller='myController'>
-    <!--相当于在指令作用域下，声明变量myName=nose-->
+    <!--ng-class正规写法-->
+    <div ng-class="{true: 'active', false: 'inactive'}[isActive]">
     <div my-directive my-name="nose" my-age="myAge" ></div>
 </body>
 

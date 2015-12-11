@@ -1,9 +1,7 @@
 define([
     './directiveModule'
 ],function(module){
-    //1.ng-class填坑
-    //ng-class对应的对象里面，不能有空格，不然会被解析为引号
-    //下面为正确写法
+    //ng-class最后一个参数布尔值, 全等true, false
     module.directive('myDirective', function(){
         return {
             restrict: 'A',

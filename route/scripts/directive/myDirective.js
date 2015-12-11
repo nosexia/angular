@@ -1,12 +1,13 @@
 define([
     './directiveModule'
 ],function(module){
+    //1.ng-class填坑
+    //ng-class对应的对象里面，不能有空格，不然会被解析为引号
+    //下面为正确写法
     module.directive('myDirective', function(){
-        //link参数，指令内部实现dom编程
-        //在指令模块下面，声明独立作用域
         return {
             restrict: 'A',
-            template: '<div >{{myName}} || {{myAge}}</div>',
+            template: '<div ng-class='+'{true:"active",false:"inactive"}[true]'+'></div>',
             replace: true,
             scope: {
                 myName: '@',

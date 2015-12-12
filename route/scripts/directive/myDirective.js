@@ -1,21 +1,18 @@
 define([
     './directiveModule'
 ],function(module){
-    //ng-class最后一个参数布尔值, 全等true, false
     module.directive('myDirective', function(){
+        //ng-repeat指令 只能解析指令里面的内容
         return {
             restrict: 'A',
-            template: '<div ng-class='+'{true:"active",false:"inactive"}[true]'+'></div>',
+            template: '<div ng-repeat="item in testArray">{{item}}</div>',
             replace: true,
             scope: {
                 myName: '@',
                 myAge: '='         
             },
             link: function($scope, element){
-                //element为angular分装的dom对象
-                element.on('click', function(){
-                    alert('1111');
-                })
+                $scope.testArray = [1, 2, 3];
             }   
         };
     });

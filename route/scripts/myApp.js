@@ -2,16 +2,15 @@ define([
     'angular',
     'directive/directiveModule',
     'directive/myDirective',
-    'moment'
-],function(angular, directiveModule, myDirective, moment){      
+    'filter/filterModule',
+    'filter/momentFilter'
+],function(angular, directiveModule, myDirective, filterModule, momentFilter){      
     //myApp模块依赖directiveModule模块
-   var myApp = angular.module('myApp', ['directiveModule']); 
+   var myApp = angular.module('myApp', ['directiveModule', 'filterModule']); 
    myApp.controller('myController', ['$scope', function($scope){
         $scope.myAge = '23';
         $scope.isActive = true;
    }]);
-
-   console.log(moment);
 
    return myApp; 
 });

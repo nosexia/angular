@@ -1,12 +1,11 @@
 define([
     'angular',
-    './filterModule'
-],function(angular, module){
-    //自定义过滤器
+    './filterModule',
+    'moment'
+],function(angular, module, moment){
    module.filter('moment', [function(){
-        //返回的值是一个函数, 返回的值是一个函数 , 返回的值是一个函数
         return function(value){
-            return value;
+            
         };
     }]);
 });

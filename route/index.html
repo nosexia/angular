@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>ng-bind-html</title>
     <script src="scripts/config.js"></script>
     <script src="scripts/require.js" data-main='appMain'></script>
 </head>
 
 <body ng-controller='myController'>
-    <div>{{myAge | moment}}</div>
+    <div ng-bind-html='myAge'></div>
 </body>
 
 

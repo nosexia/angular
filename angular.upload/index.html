@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件改变时，调用importTxtFile方法</title>
+</head>
+<body ng-controller="indexController">
+<p>{{msg}}</p>
+    <input type="file" onchange="angular.element(this).scope().importTxtFile(this.files)" >
+在html中获取当前作用域方式"angular.element(this).scope()"</br>    
+文件改变时，调用importTxtFile方法</br>
+</body>
+<script type="text/javascript">
+    var require = {
+        baseUrl: './scripts/',
+        shim: {
+            angular: {
+                exports: 'angular'
+            }    
+        }
+    };
+</script>
+<script src="scripts/require.js"  data-main="main" ></script>
+</html>

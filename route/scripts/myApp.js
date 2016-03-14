@@ -13,6 +13,5 @@ define([
         $scope.isActive = true;
    }]);
 
-   myApp.directive('test', test);
 
 });

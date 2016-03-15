@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>angular.bootstrap</title>
+    <title>ng-class支持表达式写法</title>
     
     <style type="text/css">
     .highLight{
@@ -14,10 +14,10 @@
 </head>
 
 <p>
-    angular.bootstrap，手动开启angular， angular.js对页面进行渲染</br>
-    正确写法: angular.bootstrap(document, ['myApp']), 后面的参数是一个数组。有可能触发多个应用
+    
+    
 </p>
-
+ng-class支持表达式写法，当highLight===1时，给p标签增加'highLight'类
 <body ng-controller="indexController">
     <p ng-class="{'highLight': (highLight===1)}"></p>
 

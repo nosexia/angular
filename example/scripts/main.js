@@ -2,5 +2,5 @@ require([
     'angular',
     'app'
 ],function(angular){
-    angular.bootstrap(document, 'myApp');
+    angular.bootstrap(document, ['myApp']);
 });

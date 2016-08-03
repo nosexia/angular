@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>记住两个小知识点angular-md5, 获取当前路由的参数值</title>
+    <title>$scope.$watch的用法</title>
 </head>
-<body>
-    angular中md5的调用方式</br>
-    md5.createHash('xxx');</br>
-
-    获取当前路由的参数值</br>
-    $route.current.params</br>
-
-
+<body ng-controller="myController" >
+    <input type="text" ng-model="user">
 </body>
+<script type="text/javascript" src="./scripts/angular.js"></script>
+<script type="text/javascript">
+    var myApp = angular.module('myApp', []);
+    myApp.controller('myController', function(){
+
+    });
+</script>
 </html>

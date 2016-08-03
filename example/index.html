@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>myApp.run方法自动执行</title>
+    <title>$watch加入第三个参数时，必须全等时，才不执行回调（值相等，引用相同）</title>
     
     <style type="text/css">
     .highLight{
@@ -20,6 +20,9 @@
     <p ng-click = 'test=true'>test</p>
     
     <p ng-show="test" >test显示咯</p>
+
+    <input type="text" ng-model="user.name"/>
+    改变的次数为{{update}}
 </body>
 
 <script type="text/javascript">

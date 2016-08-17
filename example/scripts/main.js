@@ -1,6 +1,6 @@
 require([
     'angular',
     'app'
-],function(angular){
+],function(angular){    
     angular.bootstrap(document, ['myApp']);
 });

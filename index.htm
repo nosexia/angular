@@ -6,6 +6,13 @@
 </head>
 <body ng-controller="myController" >
     <input type="text" ng-model="user">
+    执行setupModuleLoader执行，最后的结果是
+// 指向了一个对象
+window.angular = {};
+// angular.module指向了function
+angular.module = function(name, requires, configFn){
+
+}
 </body>
 <script type="text/javascript" src="./scripts/angular.js"></script>
 <script type="text/javascript">

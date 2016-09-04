@@ -1,0 +1,150 @@
+function $interpolate(text, hasMust){
+	// text = 'age';
+	if(满足{{age}}的条件){
+		var parts = $parse(fn = text)
+	}
+
+	if()
+	
+
+}
+
+  var $parseOptions = {
+    csp: false,
+    unwrapPromises: false,
+    logPromiseWarnings: true
+  };
+
+function $parse(exp){
+	switch(typeof exp){
+		case 'string':
+		// lexer.options = $parseOptions;(词法分析器)
+		var lexer = new Lexer($parseOptions);
+
+		// parse.lexer = lexer;
+		// parse.$filter = $filter;
+		// parse.options = $parseOptions;
+		var parser = new Parser(lexer, $filter, $parseOptions);
+		// 解析exp表达式
+		parsedExpression = parser.parse(exp, false);
+		// cache['age'] = function fn(){}
+		cache[exp] = parsedExpression;
+		return parsedExpression;
+	}
+}
+
+Parser.prototype = {
+	parse : function(text, json){
+		this.text = text;
+		this.json = json;
+		// 解析text文本
+		this.token = this.lexer.lex(text);
+		value = token.fn;
+		var value = json ? this.primary() : this.statements();
+		value.literal = false;
+		value.constant = false;
+		return value
+	},
+
+	statements : function(){
+		statements.push(this.filterChain());
+	},
+
+	// 过滤链接
+	filterChain : function(){
+		var left = this.expression();
+	},
+
+	expression : function(){
+		return this.assignment();
+	}
+
+	assignment : function(){
+
+	}
+}
+
+
+
+
+// 学习组织代码
+Lexer.prototype = {
+	lex : function(text){
+		this.index = 0;
+		
+		this.text = text
+		while(this.index < this.text){
+			this.ch = this.text.charAt(this.index);
+			if(this.isIdent(this.ch)){
+				this.readIdent();
+			}
+		}
+		return this.tokens
+		
+
+	},
+	isIdent : function(){
+
+	},
+	readIdent : function(){
+		// ident = age; this.text = age;
+		var getter = getterFn(ident, this.options, this.text);
+	    var token = {
+	      	index: start,	//0
+  			text: ident     // age
+		};
+		token.fn ＝ function (self, locals){
+			return (getter(self, locals));
+		}
+
+		token.fn.assign = function(self, value){
+			// ident = age;
+
+			return setter(self, ident, value, parser.text, parser.options);
+		}    	
+		this.tokens.push(token);
+
+	}
+}
+
+var getterFnCache = {};
+function getterFn(path, options, fullExp){
+	fn = simpleGetterFn1(pathKeys[0], fullExp);
+	getterFnCache[path] = fn;
+	return fn;
+}
+
+function simpleGetterFn1(key0, fullExp) {
+  ensureSafeMemberName(key0, fullExp);
+
+  return function simpleGetterFn1(scope, locals) {
+    if (scope == null) return undefined;
+    return ((locals && locals.hasOwnProperty(key0)) ? locals : scope)[key0];
+  };
+}
+
+// 结果是
+getterFnCache.age = function simpleGetterFn1(scope, locals) {
+    if (scope == null) return undefined;
+    return ((locals && locals.hasOwnProperty(key0)) ? locals : scope)[key0];
+  };
+
+
+	token.fn = extend(function(self, locals) {
+		return (getter(self, locals));
+	}, {
+		assign: function(self, value) {
+		  return setter(self, ident, value, parser.text, parser.options);
+		}
+	});
+
+	token.fn ＝ function (self, locals){
+		return (getter(self, locals));
+	}
+
+	token.fn.assign = function(self, value){
+		return setter(self, ident, value, parser.text, parser.options);
+	}
+
+this.unary => this.primary => this.expect() => return token ( this.tokens.shift(token) )
+

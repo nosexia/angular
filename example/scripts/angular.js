@@ -9977,6 +9977,7 @@ Parser.prototype = {
     var statements = [];
     while (true) {
       if (this.tokens.length > 0 && !this.peek('}', ')', ';', ']'))
+        // this.filterChain = token.fn
         statements.push(this.filterChain());
       if (!this.expect(';')) {
         // optimize for the common case where there is only one statement.
@@ -10134,6 +10135,7 @@ Parser.prototype = {
     } else if ((token = this.expect('!'))) {
       return this.unaryFn(token.fn, this.unary());
     } else {
+      // this.primary = token.fn
       return this.primary();
     }
   },
@@ -10448,7 +10450,6 @@ function getterFn(path, options, fullExp) {
   if (getterFnCache.hasOwnProperty(path)) {
     return getterFnCache[path];
   }
-
   var pathKeys = path.split('.'),
       pathKeysLength = pathKeys.length,
       fn;
@@ -10499,7 +10500,6 @@ function getterFn(path, options, fullExp) {
                 : '');
     });
     code += 'return s;';
-
     /* jshint -W054 */
     var evaledFnGetter = new Function('s', 'k', 'pw', code); // s=scope, k=locals, pw=promiseWarning
     /* jshint +W054 */

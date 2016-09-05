@@ -1301,8 +1301,9 @@ function bootstrap(element, modules) {
       $provide.value('$rootElement', element);
     }], 'myApp']
     */
-    // 创建注册器
+    // 绑定默认的指令，和控制器在providerCache对象下。就是注入了服务名称。
     var injector = createInjector(modules);
+    // injector返回值是instanceCache.$compile === 
     injector.invoke(['$rootScope', '$rootElement', '$compile', '$injector', '$animate',
        function(scope, element, compile, injector, animate) {
         scope.$apply(function() {
@@ -1718,7 +1719,7 @@ function setupModuleLoader(window) {
            *    Useful for application initialization.
            * @description
            * Use this method to register work which should be performed when the injector is done
-           * loading all modules.
+           * loading all modules.angularModule
            */
           run: function(block) {
             runBlocks.push(block);
@@ -1885,8 +1886,8 @@ function publishExternalAPI(angular){
   } catch (e) {
     angularModule('ngLocale', []).provider('$locale', $LocaleProvider);
   }
-// @todo
   angularModule('ng', ['ngLocale'], ['$provide',
+    // $providerCache.$provide = {}
     function ngModule($provide) {
       // $$sanitizeUriProvider needs to be before $compileProvider as it is used by it.
       $provide.provider({
@@ -3578,11 +3579,15 @@ function createInjector(modulesToLoad) {
   function provider(name, provider_) {
     assertNotHasOwnProperty(name, 'service');
     if (isFunction(provider_) || isArray(provider_)) {
+      // 调用的是providerCache中的instantiate, 也是invoke, get。
       provider_ = providerInjector.instantiate(provider_);
     }
     if (!provider_.$get) {
       throw $injectorMinErr('pget', "Provider '{0}' must define $get factory method.", name);
     }
+/*    providerCache.LocaleProvider = {
+      $get:{}
+    }*/ 
     return providerCache[name + providerSuffix] = provider_;
   }
 
@@ -3631,9 +3636,10 @@ function createInjector(modulesToLoad) {
           runBlocks = runBlocks.concat(loadModules(moduleFn.requires)).concat(moduleFn._runBlocks);
           // @todo ['ngLocale']
           for(invokeQueue = moduleFn._invokeQueue, i = 0, ii = invokeQueue.length; i < ii; i++) {
-            var invokeArgs = invokeQueue[i],
-                provider = providerInjector.get(invokeArgs[0]);
-
+            var invokeArgs = invokeQueue[i],          
+                // 当invokeArgs[0] === $injector时 providerInjector.get(invokeArgs[0]) === providerInjector
+                provider = providerInjector.get(invokeArgs[0]);     
+                // 通过这里绑定的指令，存在$providerCache。
             provider[invokeArgs[1]].apply(provider, invokeArgs[2]);
           }
         } else if (isFunction(module)) {
@@ -3667,7 +3673,6 @@ function createInjector(modulesToLoad) {
   ////////////////////////////////////
 
   function createInternalInjector(cache, factory) {
-
     function getService(serviceName) {
       if (cache.hasOwnProperty(serviceName)) {
         if (cache[serviceName] === INSTANTIATING) {
@@ -3712,9 +3717,9 @@ function createInjector(modulesToLoad) {
         // this means that we must be an array.
         fn = fn[length];
       }
-
       // http://jsperf.com/angularjs-invoke-apply-vs-switch
       // #5388
+      // 注册函数回调
       return fn.apply(self, args);
     }
 
@@ -3727,7 +3732,6 @@ function createInjector(modulesToLoad) {
       Constructor.prototype = (isArray(Type) ? Type[Type.length - 1] : Type).prototype;
       instance = new Constructor();
       returnedValue = invoke(Type, instance, locals);
-
       return isObject(returnedValue) || isFunction(returnedValue) ? returnedValue : instance;
     }
 
@@ -5256,6 +5260,8 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             return directives;
           }]);
       }
+      // {}.a = [];
+      // {}.a = [directiveFactory];
       hasDirectives[name].push(directiveFactory);
     } else {
       forEach(name, reverseParams(registerDirective));
@@ -5330,7 +5336,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             '$controller', '$rootScope', '$document', '$sce', '$animate', '$$sanitizeUri',
     function($injector,   $interpolate,   $exceptionHandler,   $http,   $templateCache,   $parse,
              $controller,   $rootScope,   $document,   $sce,   $animate,   $$sanitizeUri) {
-
     var Attributes = function(element, attr) {
       this.$$element = element;
       this.$attr = attr || {};
@@ -5506,8 +5511,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
     //================================
 
-    function compile($compileNodes, transcludeFn, maxPriority, ignoreDirective,
-                        previousCompileContext) {
+    function compile($compileNodes, transcludeFn, maxPriority, ignoreDirective,previousCompileContext) {
       if (!($compileNodes instanceof jqLite)) {
         // jquery always rewraps, whereas we need to preserve the original selector so that we can
         // modify it.
@@ -5520,6 +5524,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           $compileNodes[index] = node = jqLite(node).wrap('<span></span>').parent()[0];
         }
       });
+      // 这个函数相当复杂，解析Nodes->收集指令->
       var compositeLinkFn =
               compileNodes($compileNodes, transcludeFn, $compileNodes,
                            maxPriority, ignoreDirective, previousCompileContext);
@@ -5531,7 +5536,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         var $linkNode = cloneConnectFn
           ? JQLitePrototype.clone.call($compileNodes) // IMPORTANT!!!
           : $compileNodes;
-
         forEach(transcludeControllers, function(instance, name) {
           $linkNode.data('$' + name + 'Controller', instance);
         });
@@ -5541,10 +5545,10 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           var node = $linkNode[i],
               nodeType = node.nodeType;
           if (nodeType === 1 /* element */ || nodeType === 9 /* document */) {
+            // @todo
             $linkNode.eq(i).data('$scope', scope);
           }
         }
-
         if (cloneConnectFn) cloneConnectFn($linkNode, scope);
         if (compositeLinkFn) compositeLinkFn(scope, $linkNode, $linkNode);
         return $linkNode;
@@ -5575,62 +5579,65 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
      * @param {number=} maxPriority Max directive priority.
      * @returns {?function} A composite linking function of all of the matched directives or null.
      */
-    function compileNodes(nodeList, transcludeFn, $rootElement, maxPriority, ignoreDirective,
-                            previousCompileContext) {
+    // 收集指令-> 应用指令
+    function compileNodes(nodeList, transcludeFn, $rootElement, maxPriority, ignoreDirective,previousCompileContext) {
       var linkFns = [],
-          attrs, directives, nodeLinkFn, childNodes, childLinkFn, linkFnFound;
-
+          attrs, directives, nodeLinkFn, childNodes, childLinkFn, linkFnFound;   
       for (var i = 0; i < nodeList.length; i++) {
         attrs = new Attributes();
-
+        // attrs = {
+        //     $$element :undefined,
+        //     $attr : {}
+        // }
         // we must always refer to nodeList[i] since the nodes can be replaced underneath us.
         directives = collectDirectives(nodeList[i], [], attrs, i === 0 ? maxPriority : undefined,
                                         ignoreDirective);
-
+        // attrs = {
+        //   ngController : 'indexController',
+        //   $attrs : {
+        //     'ngController' : 'ng-controller'
+        //   }
+        // }
         nodeLinkFn = (directives.length)
             ? applyDirectivesToNode(directives, nodeList[i], attrs, transcludeFn, $rootElement,
                                       null, [], [], previousCompileContext)
             : null;
-
         if (nodeLinkFn && nodeLinkFn.scope) {
           safeAddClass(jqLite(nodeList[i]), 'ng-scope');
         }
-
         childLinkFn = (nodeLinkFn && nodeLinkFn.terminal ||
                       !(childNodes = nodeList[i].childNodes) ||
                       !childNodes.length)
             ? null
             : compileNodes(childNodes,
-                 nodeLinkFn ? nodeLinkFn.transclude : transcludeFn);
-
+                 nodeLinkFn ? nodeLinkFn.transclude : transcludeFn); 
         linkFns.push(nodeLinkFn, childLinkFn);
         linkFnFound = linkFnFound || nodeLinkFn || childLinkFn;
         //use the previous context only for the first element in the virtual group
         previousCompileContext = null;
       }
-
       // return a linking function if we have found anything, null otherwise
       return linkFnFound ? compositeLinkFn : null;
-
+      // 猜想，执行指令对于的link函数
       function compositeLinkFn(scope, nodeList, $rootElement, boundTranscludeFn) {
         var nodeLinkFn, childLinkFn, node, $node, childScope, childTranscludeFn, i, ii, n;
-
         // copy nodeList so that linking doesn't break due to live list updates.
         var nodeListLength = nodeList.length,
+
             stableNodeList = new Array(nodeListLength);
         for (i = 0; i < nodeListLength; i++) {
           stableNodeList[i] = nodeList[i];
         }
-
         for(i = 0, n = 0, ii = linkFns.length; i < ii; n++) {
           node = stableNodeList[n];
           nodeLinkFn = linkFns[i++];
           childLinkFn = linkFns[i++];
           $node = jqLite(node);
-
           if (nodeLinkFn) {
             if (nodeLinkFn.scope) {
+              // scope为 $rootScopeProvider下的this.$get方法的返回值($Scope的实例)
               childScope = scope.$new();
+              //childScope实例拥有$rootScope实例上面的所有方法，$Scope.prototype上面的所有方法。
               $node.data('$scope', childScope);
             } else {
               childScope = scope;
@@ -5678,6 +5685,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
      * @param attrs The shared attrs object which is used to populate the normalized attributes.
      * @param {number=} maxPriority Max directive priority.
      */
+    // 通过属性来添加指令
     function collectDirectives(node, directives, attrs, maxPriority, ignoreDirective) {
       var nodeType = node.nodeType,
           attrsMap = attrs.$attr,
@@ -5695,7 +5703,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
                    j = 0, jj = nAttrs && nAttrs.length; j < jj; j++) {
             var attrStartName = false;
             var attrEndName = false;
-
             attr = nAttrs[j];
             if (!msie || msie >= 8 || attr.specified) {
               name = attr.name;
@@ -5718,6 +5725,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               if (getBooleanAttrName(node, nName)) {
                 attrs[nName] = true; // presence means true
               }
+              // 是否有绑定类似xx="{{haha}}";
               addAttrInterpolateDirective(node, directives, value, nName);
               addDirective(directives, nName, 'A', maxPriority, ignoreDirective, attrStartName,
                             attrEndName);
@@ -5755,7 +5763,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           }
           break;
       }
-
       directives.sort(byPriority);
       return directives;
     }
@@ -5831,11 +5838,8 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
      *                                        node
      * @returns linkFn
      */
-    function applyDirectivesToNode(directives, compileNode, templateAttrs, transcludeFn,
-                                   jqCollection, originalReplaceDirective, preLinkFns, postLinkFns,
-                                   previousCompileContext) {
+    function applyDirectivesToNode(directives, compileNode, templateAttrs, transcludeFn,jqCollection, originalReplaceDirective, preLinkFns, postLinkFns,previousCompileContext) {
       previousCompileContext = previousCompileContext || {};
-
       var terminalPriority = -Number.MAX_VALUE,
           newScopeDirective,
           controllerDirectives = previousCompileContext.controllerDirectives,
@@ -5852,7 +5856,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           childTranscludeFn = transcludeFn,
           linkFn,
           directiveValue;
-
       // executes all directives on the current element
       for(var i = 0, ii = directives.length; i < ii; i++) {
         directive = directives[i];
@@ -5868,7 +5871,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         if (terminalPriority > directive.priority) {
           break; // prevent further processing of directives
         }
-
         if (directiveValue = directive.scope) {
           newScopeDirective = newScopeDirective || directive;
 
@@ -5882,10 +5884,11 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             }
           }
         }
-
+        // directive.name = ngController
         directiveName = directive.name;
 
         if (!directive.templateUrl && directive.controller) {
+          // directive.controller = '@'
           directiveValue = directive.controller;
           controllerDirectives = controllerDirectives || {};
           assertNoDuplicate("'" + directiveName + "' controller",
@@ -5978,7 +5981,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             $compileNode.html(directiveValue);
           }
         }
-
         if (directive.templateUrl) {
           assertNoDuplicate('template', templateDirective, directive, $compileNode);
           templateDirective = directive;
@@ -6017,7 +6019,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
       nodeLinkFn.scope = newScopeDirective && newScopeDirective.scope === true;
       nodeLinkFn.transclude = hasTranscludeDirective && childTranscludeFn;
-
       // might be normal or delayed nodeLinkFn depending on if templateUrl is present
       return nodeLinkFn;
 
@@ -6081,9 +6082,16 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
         if (compileNode === linkNode) {
           attrs = templateAttrs;
-        } else {
+        } else {    
           attrs = shallowCopy(templateAttrs, new Attributes(jqLite(linkNode), templateAttrs.$attr));
         }
+        // attr = {
+        //   $attr : {
+        //     ngController : 'ng-controller',
+        //   },
+        //   ngController : 'indexController',
+        //   $$element : $('body')
+        // }
         $element = attrs.$$element;
 
         if (newIsolateScopeDirective) {
@@ -6187,15 +6195,17 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
             controller = directive.controller;
             if (controller == '@') {
+              // controller = 'indexController'
               controller = attrs[directive.name];
             }
-
+            // Contruction类的一个实例，没有任何属性
             controllerInstance = $controller(controller, locals);
             // For directives with element transclusion the element is a comment,
             // but jQuery .data doesn't support attaching data to comment nodes as it's hard to
             // clean up (http://bugs.jquery.com/ticket/8335).
             // Instead, we save the controllers for the element in a local hash and attach to .data
             // later, once we have the actual element.
+            
             elementControllers[directive.name] = controllerInstance;
             if (!hasElementTranscludeDirective) {
               $element.data('$' + directive.name + 'Controller', controllerInstance);
@@ -6278,8 +6288,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
      *   * `M`: comment
      * @returns true if directive was added.
      */
-    function addDirective(tDirectives, name, location, maxPriority, ignoreDirective, startAttrName,
-                          endAttrName) {
+    function addDirective(tDirectives, name, location, maxPriority, ignoreDirective, startAttrName,endAttrName) {
       if (name === ignoreDirective) return null;
       var match = null;
       if (hasDirectives.hasOwnProperty(name)) {
@@ -6502,13 +6511,12 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       // no interpolation found -> ignore
       if (!interpolateFn) return;
 
-
       if (name === "multiple" && nodeName_(node) === "SELECT") {
         throw $compileMinErr("selmulti",
             "Binding to the 'multiple' attribute is not supported. Element: {0}",
             startingTag(node));
       }
-
+      
       directives.push({
         priority: 100,
         compile: function() {
@@ -6776,7 +6784,7 @@ function $ControllerProvider() {
 
         assertArgFn(expression, constructor, true);
       }
-
+      // $injector = instanceInjector;
       instance = $injector.instantiate(expression, locals);
 
       if (identifier) {
@@ -8200,7 +8208,6 @@ function $InterpolateProvider() {
           fn,
           exp,
           concat = [];
-
       while(index < length) {
         if ( ((startIndex = text.indexOf(startSymbol, index)) != -1) &&
              ((endIndex = text.indexOf(endSymbol, startIndex + startSymbolLength)) != -1) ) {
@@ -10661,10 +10668,8 @@ function $ParseProvider() {
     }
   };
 
-
   this.$get = ['$filter', '$sniffer', '$log', function($filter, $sniffer, $log) {
     $parseOptions.csp = $sniffer.csp;
-
     promiseWarning = function promiseWarningFn(fullExp) {
       if (!$parseOptions.logPromiseWarnings || promiseWarningCache.hasOwnProperty(fullExp)) return;
       promiseWarningCache[fullExp] = true;
@@ -10681,8 +10686,11 @@ function $ParseProvider() {
           if (cache.hasOwnProperty(exp)) {
             return cache[exp];
           }
-
+          //lexer.options = $parseOptions;
           var lexer = new Lexer($parseOptions);
+          // parser.lexer = lexer;
+          // parser.$filter = fn;
+          // parser.options = $parseOptions
           var parser = new Parser(lexer, $filter, $parseOptions);
           parsedExpression = parser.parse(exp, false);
 
@@ -10691,7 +10699,6 @@ function $ParseProvider() {
             // This is more performant that using Object.prototype.hasOwnProperty.call
             cache[exp] = parsedExpression;
           }
-
           return parsedExpression;
 
         case 'function':
@@ -10912,7 +10919,6 @@ function qFactory(nextTick, exceptionHandler) {
           var callbacks = pending;
           pending = undefined;
           value = ref(val);
-
           if (callbacks.length) {
             nextTick(function() {
               var callback;
@@ -11034,8 +11040,9 @@ function qFactory(nextTick, exceptionHandler) {
   };
 
 
-  var ref = function(value) {
+  var ref = function(value) {    
     if (value && isFunction(value.then)) return value;
+
     return {
       then: function(callback) {
         var result = defer();
@@ -11297,7 +11304,6 @@ function $RootScopeProvider(){
     }
     return TTL;
   };
-
   this.$get = ['$injector', '$exceptionHandler', '$parse', '$browser',
       function( $injector,   $exceptionHandler,   $parse,   $browser) {
 
@@ -11419,6 +11425,7 @@ function $RootScopeProvider(){
           this.$$childTail.$$nextSibling = child;
           this.$$childTail = child;
         } else {
+          // $rootScope.$$childHead = child
           this.$$childHead = this.$$childTail = child;
         }
         return child;
@@ -11537,6 +11544,7 @@ function $RootScopeProvider(){
       $watch: function(watchExp, listener, objectEquality) {
         var scope = this,
             get = compileToFn(watchExp, 'watch'),
+
             array = scope.$$watchers,
             watcher = {
               fn: listener,
@@ -11545,7 +11553,6 @@ function $RootScopeProvider(){
               exp: watchExp,
               eq: !!objectEquality
             };
-
         lastDirtyWatch = null;
 
         // in the case user pass string, we need to compile it, do we really need this ?
@@ -11568,7 +11575,6 @@ function $RootScopeProvider(){
         // we use unshift since we use a while loop in $digest for speed.
         // the while loop reads in reverse order.
         array.unshift(watcher);
-
         return function() {
           arrayRemove(array, watcher);
           lastDirtyWatch = null;
@@ -11846,7 +11852,7 @@ function $RootScopeProvider(){
                 current = current.$parent;
               }
             }
-          } while ((current = next));
+          } while ((current = next));   // 子作用域
 
           // `break traverseScopesLoop;` takes us to here
 
@@ -13601,7 +13607,6 @@ function $TimeoutProvider() {
 
         if (!skipApply) $rootScope.$apply();
       }, delay);
-
       promise.$$timeoutId = timeoutId;
       deferreds[timeoutId] = deferred;
 

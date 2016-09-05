@@ -1,0 +1,222 @@
+1. scope的创建，怎么在scope中取值
+
+
+instanceInjector.invoke(['$rootScope', function($scope){
+    // 创建全局变量$rootScope => new Scope();
+}]);
+
+
+
+
+2.1(angular内部注册默认注册器， 注册到$providerCache对象)
+angular.module('ng', ['ngLocale'], ['$provider', function($provider){
+    // 创建默认服务
+    $provider.provider('$controller', $controllerProvider);
+    
+    // 创建默认指令
+    $provider.provider('$compile', '$compileProvider')
+    .directive('ngController', 'ngControllerDirective')
+}])
+
+// 服务得到的结果=>$providerCache.$controllerProvider = {
+    register : fn,
+    $get : fn
+}
+
+// 创建默认指令得到结果
+    $providerCache.$compileProvider = {
+        directive : fn
+    }
+
+    hasDirective['ngController'] = [];
+
+    $providerCache.ngControllerDirectiveProvider = {
+        $get : ['$injector', '$exceptionHandler', function($injector, $exceptionHandler){}]
+    }
+
+
+
+
+
+2.2 用户自定义模块myApp, 模块绑定控制器，以及需要执行的模块私有队列
+var myApp = angular.module('myApp', []);
+myApp.controller('indexController', ['$scope', function($scope){
+    $scope.age = 'nose';
+}])
+
+function setupModuleLoader(){
+    var instanceModule = {
+        _invokeQueue : invokeQueue
+        controller : invokeLater('$controllerProvider', register)
+    }
+
+    function invokeLater(provider, method){
+        return function {
+           instanceModule.push(provider, method, arguments); 
+        }
+    }
+}
+// 执行完成的结果
+instanceModule._invokeQueue = ['$controllerProvider', 'register', ['indexController', ['$scope', function($scope){
+    $scope.age = 'nose';
+}]] ]
+
+
+3.开始执行所有的模块
+angular.bootStrap(document.body, 'myApp');
+
+function bootStrap(){
+    var instanceInjector = cretateInjector(module) = >loadModules(modulesToload);
+    instanceInjector.invoke(['$rootScope', $rootElement', '$compile', function(scope, element, compile){
+        scope.$apply(function(){
+            compile(element)(scope);
+        })
+    }])
+}
+function loadModules(modulesToLoad){
+    //加载到module为'myApp'时,
+    // $providerCache上面的$controllerProvider注册器
+    var provider = $providerInjector.get(arguments[0]);
+    //
+    执行结果:controllers['indexController'] = ['indexController', ['$scope', function($scope){
+        $scope.age = 'nose';
+    }]] 
+    provider[arguments[1]].apply(provider, arguments[2]);
+}
+
+
+// 执行compile(element)(scope)
+
+function compile = >　
+
+function compileNodes(){
+    var directives =   collectDirective;
+    var nodeLinkFn = applyDirectivesToNode(directives, node)
+}
+
+function collectDirective(){
+    // 对指令进行分类
+      addDirective(directives, nName, 'A', maxPriority, ignoreDirective, attrStartName,
+                attrEndName);
+}
+
+// 获取自定义的属性
+addDirective是在$compileProvider->$get下面;  
+var Suffix =>Directive;
+$injector->$instanceInjector
+function addDirective(){
+
+    directives = $injector.get(name + Suffix)
+    directives = instanceCache['ngControllerDirective'] =    {
+        scope: true,
+        index : 0,
+        name : 'ngController'
+        require : 'ngController'
+        restrict : 'A',
+        controller: '@',
+        priority: 500
+    }; 
+}
+
+
+function applyDirectivesToNode(){
+    if (!directive.templateUrl && directive.controller) {
+        controllerDirectives = controllerDirectives || {};
+        controllerDirectives[directiveName] = directive;
+    }
+    // 指令中scope属性，需要创建新的指令作用率
+    if (directiveValue = directive.scope) {
+          newScopeDirective = newScopeDirective || directive;
+        }
+        nodeLinkFn.scope = newScopeDirective && newScopeDirective.scope === true;
+        nodeLinkFn.transclude = hasTranscludeDirective && childTranscludeFn;
+    return nodeLinkFn;
+    function nodeLinkFn(){
+        // ba;
+    }
+}
+
+compile(element)(scope)=>compositeLinkFn
+
+function compositeLinkFn(){
+     if (nodeLinkFn) {
+            if (nodeLinkFn.scope) {
+              // scope为 $rootScopeProvider下的this.$get方法的返回值($Scope的实例)
+              // $rootChild.$$childHead = childScope;   (childScope为$rootScope的子集)      
+              childScope = scope.$new();
+              //childScope实例拥有$rootScope实例上面的所有方法，$Scope.prototype上面的所有方法。
+              $node.data('$scope', childScope);
+            } else {
+              childScope = scope;
+            }
+            // childScope为ngController指令下，创建的作用域
+            nodeLinkFn(childLinkFn, childScope, node, $rootElement, boundTranscludeFn);
+        }
+}
+
+function nodeLinkFn(){
+    var locals = {
+      $scope: directive === newIsolateScopeDirective || directive.$$isolateScope ? isolateScope : scope,
+      $element: $element,
+      $attrs: attrs,
+      $transclude: transcludeFn
+    }, controllerInstance;
+
+    controller = directive.controller;
+    if (controller == '@') {
+      // controller = 'indexController'
+      controller = attrs[directive.name];
+    }
+    // Contruction类的一个实例，没有任何属性
+    controllerInstance = $controller(controller, locals);
+    elementControllers[directive.name] = controllerInstance;
+}
+
+function $controller(){
+    // indexController通过controller控制器，注册到了controllers组合上面。
+    expression = controllers.hasOwnProperty(constructor)
+
+    expression = ['$scope', function($scope){ $scope.name = 'nose' }]
+    var locals = {
+        $element : $element,
+        $attrs :attrs
+        $scope : scope
+
+    }
+    instance = $injector.instantiate(expression, locals);
+    // 返回一个Constructor实例对象。
+    return instance
+}
+
+function instantiate(provider_, local){
+    var Constructor = function (){}
+    Constructor.prototype = provider[provider.length-1].prototype;
+    var instance = new Constructor();
+
+    var returnedValue = invoke(provider_, instance, local);
+}
+
+function invoke(fn, self, local){
+    var args = [];
+    var $inject = annotate(fn);
+    var length = $inject.length;
+    args.push({
+        local && local.hasOwnProperty($inject[i]);
+    });
+    if(!fn.inject){
+        fn = fn[length]
+    }
+    // 把age绑定在创建的子作用域上面
+    fn.apply(self, args);
+}
+
+// 总结创建ngController作用域，并且把age属性存在作用域中
+收集body上面所有的指令
+var directives = collectDirective(node, [])
+
+// 给nodeLinkFn增加scope属性,
+// 给controllerDirectives.ngController = directives;
+var nodeLinkFn = applyDirectiveToNode(node, directives);
+
+调用compositeLinkFn =>创建一个字作用域
+调用nodeLinkFn,把age加入子作用域中。

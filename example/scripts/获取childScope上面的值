@@ -1,0 +1,157 @@
+当node为'{{age}}'文本节点时,
+
+function collectDirectives(directives, node){
+    var type = node.nodeType;
+    switch(type){
+        case 3:
+            addTextInterpolateDirective(directives, node.nodeValue)
+    }
+}
+
+function addTextpolateDirectives(directives, text){
+    var interpolateFn = $interpolate(text, true);
+        directives.push({
+          priority: 0,
+          compile: valueFn(function textInterpolateLinkFn(scope, node) {
+            var parent = node.parent(),
+                bindings = parent.data('$binding') || [];
+            bindings.push(interpolateFn);
+            safeAddClass(parent.data('$binding', bindings), 'ng-binding');
+            scope.$watch(interpolateFn, function interpolateFnWatchAction(value) {
+              node[0].nodeValue = value;
+            });
+        })
+}
+
+function $interpolate(text, mustHasExpress){
+    var length = text.length;
+    var index = 0;
+    var fn
+    // 对文件进行判断
+    if(length > index){
+        if(字符是否是'{{age}}'结构){
+            // todo $parse
+            parts.push(fn = $parse(exp = text.substring(startIndex + startSymbolLength, endIndex)));    
+        }
+        
+    };
+    fn = function(context) {
+          try {
+            for(var i = 0, ii = length, part; i<ii; i++) {
+              if (typeof (part = parts[i]) == 'function') {
+                part = part(context);
+                if (trustedContext) {
+                  part = $sce.getTrusted(trustedContext, part);
+                } else {
+                  part = $sce.valueOf(part);
+                }
+                if (part === null || isUndefined(part)) {
+                  part = '';
+                } else if (typeof part != 'string') {
+                  part = toJson(part);
+                }
+              }
+              concat[i] = part;
+            }
+            return concat.join('');
+          }
+          catch(err) {
+            var newErr = $interpolateMinErr('interr', "Can't interpolate: {0}\n{1}", text,
+                err.toString());
+            $exceptionHandler(newErr);
+          }
+        };
+        fn.exp = text;
+        fn.parts = parts;
+
+
+}
+
+function $parse(){
+    
+}
+
+// 得到的结论为
+directives = {
+    priority: 0,
+      compile: function(){
+            return function textInterpolateLinkFn(scope, node) {
+                var parent = node.parent(),
+                bindings = parent.data('$binding') || [];
+                bindings.push(interpolateFn);
+                safeAddClass(parent.data('$binding', bindings), 'ng-binding');
+                scope.$watch(interpolateFn, function interpolateFnWatchAction(value) {
+                  node[0].nodeValue = value;
+            }
+        });
+}
+
+var linkFn = function textInterpolateLinkFn(scope, node) {
+                var parent = node.parent(),
+                bindings = parent.data('$binding') || [];
+                bindings.push(interpolateFn);
+                safeAddClass(parent.data('$binding', bindings), 'ng-binding');
+                scope.$watch(interpolateFn, function interpolateFnWatchAction(value) {
+                  node[0].nodeValue = value;
+                }
+
+
+function applyDirectiveToNode(){
+    if(directive.compile){
+        linkFn = directive.compile($compileNode, templateAttrs, childTranscludeFn);
+        addLinkFns(null, linkFn, attrStart, attrEnd);
+    }
+    function(null,post){
+        // 把linkFn放入postLinkFns
+        postLinkFns.push(post);
+    }
+
+
+    function nodeLinkFn(childLinkFn){
+        // childLinkFn为compositeLinkFn
+        var scopeToChild = scope;
+        childLinkFn && childLinkFn(scopeToChild, linkNode.childNodes, undefined, boundTranscludeFn);
+
+        linkFn = postLinkFns[i];
+         linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs,
+                linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn);
+    }
+}
+
+
+// 执行linkFn的结果
+scope.$watch(interpolateFn, function interpolateFnWatchAction(value) {
+  node[0].nodeValue = value;
+}
+
+function $watch(exp, fn){
+    scope.$$watch = [{
+        watcher = {
+          fn: listener,
+          last: initWatchVal,
+          get: get,
+          exp: watchExp,
+          eq: !!objectEquality
+        };
+    }]
+}
+
+//最后执行
+function $digest(){
+    watch.fn(value, ((last === initWatchVal) ? value : last), current);
+}
+
+最后更新值
+
+
+
+
+
+
+
+
+function compositeLinkFn(scope, nodesList, $rootElement){
+    // childLinkFn为null;
+    nodeLinkFn(childLinkFn, childScope, node, $rootElement, boundTranscludeFn);
+}
+

@@ -1,0 +1,32 @@
+Scope.prototype = {
+    $apply : function(){
+        try{
+            beginPhase('$apply');
+            return this.$eval(expr);
+        }finally(){
+            $rootScope.$degist();
+        }
+    },
+    $eval : function(expr){
+        return $parse(expr)(this, local)
+    }
+}
+
+function $parseProvider(){
+    this.$get = ['$parse', function($parse){
+        return function(expr){
+            switch(typeof expr){
+                case 'function':
+                    return expr;
+            }
+        }
+    }]
+}
+
+function beginPhase(parse){
+    $rootScope.$$parse = parse;
+}
+
+
+
+// 执行scope.$apply的大体流程，先执行里面的函数参数，然后执行$rootScope.$degist(),

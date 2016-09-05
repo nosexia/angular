@@ -1,0 +1,32 @@
+intanceInjector.invoke(['$rootScope', '$rootElement', '$injector', function(scope, element, injector){
+   scope.$apply(function(){
+        element.data('injector', injector);
+        compile(element)(scope);
+   }) 
+}])
+
+function $apply(){
+    try{
+        $beginPhase('$apply');
+        return this.$eval(expr);
+    }catch(e){
+
+    }finally{
+        $rootScope.$digest();
+    }
+
+}
+
+
+function $eval(expr){
+    return $parse(expr)(this, locals);
+}
+
+function $parse(expr){
+    switch(typeof expr){
+        case function :
+            return expr
+    }
+}
+
+// 总结执行完了scope.$apply中的函数之后，执行$rootScope.$digest();

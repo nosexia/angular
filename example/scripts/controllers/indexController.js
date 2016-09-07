@@ -11,6 +11,6 @@ define([
         // defer.resolve();
 
         // $timeout.cancel(timeoutPromise);
-        $scope.age = 'nose';
+        $scope.value = 'hahha';
     }];
 });

@@ -1,0 +1,16 @@
+1.body标签中指令ng-controller创建子作用域
+2.1子元素{{age}}中执行childScope.age = 'nose';
+2.2childScope.$watch(interpolateFn, function(value){
+    node.nodeValue = value;
+})
+给childScope.$$watcher增加一个监听者
+
+function $watch(watchExp, listener){
+    var watcher = {
+        get : interpolateFn,            // 函数中带有属性名
+        fn : listener
+    }
+}
+
+3.最后进行$rootScope.degist();  //脏值检查
+watch.get(current);

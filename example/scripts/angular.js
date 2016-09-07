@@ -2221,7 +2221,6 @@ function jqLiteRemoveData(element, name) {
 function jqLiteExpandoStore(element, key, value) {
   var expandoId = element[jqName],
       expandoStore = jqCache[expandoId || -1];
-
   if (isDefined(value)) {
     if (!expandoStore) {
       element[jqName] = expandoId = jqNextId();
@@ -5697,7 +5696,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           // use the node name: <directive>
           addDirective(directives,
               directiveNormalize(nodeName_(node).toLowerCase()), 'E', maxPriority, ignoreDirective);
-
           // iterate over the attributes
           for (var attr, name, nName, ngAttrName, value, nAttrs = node.attributes,
                    j = 0, jj = nAttrs && nAttrs.length; j < jj; j++) {
@@ -5886,7 +5884,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         }
         // directive.name = ngController
         directiveName = directive.name;
-
         if (!directive.templateUrl && directive.controller) {
           // directive.controller = '@'
           directiveValue = directive.controller;
@@ -6060,7 +6057,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             value = elementControllers[require];
           }
           value = value || $element[retrievalMethod]('$' + require + 'Controller');
-
           if (!value && !optional) {
             throw $compileMinErr('ctreq',
                 "Controller '{0}', required by directive '{1}', can't be found!",
@@ -6082,7 +6078,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
         if (compileNode === linkNode) {
           attrs = templateAttrs;
-        } else {    
+        } else {  
           attrs = shallowCopy(templateAttrs, new Attributes(jqLite(linkNode), templateAttrs.$attr));
         }
         // attr = {
@@ -6198,7 +6194,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               // controller = 'indexController'
               controller = attrs[directive.name];
             }
-            // Contruction类的一个实例，没有任何属性
             controllerInstance = $controller(controller, locals);
             // For directives with element transclusion the element is a comment,
             // but jQuery .data doesn't support attaching data to comment nodes as it's hard to
@@ -6216,7 +6211,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             }
           });
         }
-
         // PRELINKING
         for(i = 0, ii = preLinkFns.length; i < ii; i++) {
           try {
@@ -6237,7 +6231,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         }
         childLinkFn && childLinkFn(scopeToChild, linkNode.childNodes, undefined, boundTranscludeFn);
 
-        // POSTLINKING
+        // POSTLINKING, 使用倒序
         for(i = postLinkFns.length - 1; i >= 0; i--) {
           try {
             linkFn = postLinkFns[i];
@@ -9626,7 +9620,7 @@ Lexer.prototype = {
         }
       }
       this.lastCh = this.ch;
-    }
+    };
     return this.tokens;
   },
 
@@ -9809,6 +9803,7 @@ Lexer.prototype = {
       } else if (ch === '\\') {
         escape = true;
       } else if (ch === quote) {
+        // 当到'"'前面一个字符时
         this.index++;
         this.tokens.push({
           index: start,
@@ -9819,7 +9814,7 @@ Lexer.prototype = {
         });
         return;
       } else {
-        string += ch;
+        string += ch;   // "'h"
       }
       this.index++;
     }
@@ -9862,9 +9857,7 @@ Parser.prototype = {
         this.throwError('is not valid json', {text: text, index: 0});
       };
     }
-
     var value = json ? this.primary() : this.statements();
-
     if (this.tokens.length !== 0) {
       this.throwError('is an unexpected token', this.tokens[0]);
     }
@@ -9984,6 +9977,7 @@ Parser.prototype = {
     var statements = [];
     while (true) {
       if (this.tokens.length > 0 && !this.peek('}', ')', ';', ']'))
+        // this.filterChain = token.fn
         statements.push(this.filterChain());
       if (!this.expect(';')) {
         // optimize for the common case where there is only one statement.
@@ -10141,6 +10135,7 @@ Parser.prototype = {
     } else if ((token = this.expect('!'))) {
       return this.unaryFn(token.fn, this.unary());
     } else {
+      // this.primary = token.fn
       return this.primary();
     }
   },
@@ -10455,7 +10450,6 @@ function getterFn(path, options, fullExp) {
   if (getterFnCache.hasOwnProperty(path)) {
     return getterFnCache[path];
   }
-
   var pathKeys = path.split('.'),
       pathKeysLength = pathKeys.length,
       fn;
@@ -10506,7 +10500,6 @@ function getterFn(path, options, fullExp) {
                 : '');
     });
     code += 'return s;';
-
     /* jshint -W054 */
     var evaledFnGetter = new Function('s', 'k', 'pw', code); // s=scope, k=locals, pw=promiseWarning
     /* jshint +W054 */
@@ -10693,7 +10686,6 @@ function $ParseProvider() {
           // parser.options = $parseOptions
           var parser = new Parser(lexer, $filter, $parseOptions);
           parsedExpression = parser.parse(exp, false);
-
           if (exp !== 'hasOwnProperty') {
             // Only cache the value if it's not going to mess up the cache object
             // This is more performant that using Object.prototype.hasOwnProperty.call
@@ -11554,7 +11546,6 @@ function $RootScopeProvider(){
               eq: !!objectEquality
             };
         lastDirtyWatch = null;
-
         // in the case user pass string, we need to compile it, do we really need this ?
         if (!isFunction(listener)) {
           var listenFn = compileToFn(listener || noop, 'listener');
@@ -16034,7 +16025,6 @@ function textInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   // More about composition events: https://developer.mozilla.org/en-US/docs/Web/API/CompositionEvent
   if (!$sniffer.android) {
     var composing = false;
-
     element.on('compositionstart', function(data) {
       composing = true;
     });
@@ -16047,7 +16037,6 @@ function textInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   var listener = function() {
     if (composing) return;
     var value = element.val();
-
     // By default we will trim the value
     // If the attribute ng-trim exists we will avoid trimming
     // e.g. <input ng-model="foo" ng-trim="false">
@@ -16800,7 +16789,6 @@ var ngModelDirective = function() {
     controller: NgModelController,
     link: function(scope, element, attr, ctrls) {
       // notify others, especially parent forms
-
       var modelCtrl = ctrls[0],
           formCtrl = ctrls[1] || nullFormCtrl;
 

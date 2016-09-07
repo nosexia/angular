@@ -1,0 +1,124 @@
+element = jqLite(element);
+element.injector()
+
+function doBootStrap(){
+    element = jqLite(element);
+    element.injector()
+
+    instanceInjector.invoke['$injector', '$rootScope', '$rootElement', function(injector, scope, element){
+        scope.$apply(function(){
+            element.data('$injector', injector);
+        })
+    }]
+}
+
+JQLite.prototype.injector = function(element) {
+    return jqLiteInheritedData(element, '$injector');
+  },
+
+
+
+function jqLiteInheritedData(){
+    // names[i] = '$injector';
+    element.data(names[i])
+}
+
+
+JQLite.prototype.data = function(arg1, arg2) {
+    var i, key;
+    // arg1 = '$ngModelController'
+    // jqLiteHasClass has only two arguments, but is a getter-only fn, so we need to special-case it
+    // in a way that survives minification.
+    // jqLiteEmpty takes no arguments but is a setter.
+    if (fn !== jqLiteEmpty &&
+        (((fn.length == 2 && (fn !== jqLiteHasClass && fn !== jqLiteController)) ? arg1 : arg2) === undefined)) {
+      if (isObject(arg1)) {
+
+        // we are a write, but the object properties are the key/values
+        for (i = 0; i < this.length; i++) {
+          if (fn === jqLiteData) {
+            // data() takes the whole object in jQuery
+            fn(this[i], arg1);
+          } else {
+            for (key in arg1) {
+              fn(this[i], key, arg1[key]);
+            }
+          }
+        }
+        // return self for chaining
+        return this;
+      } else {
+        // we are a read, so read the first child.
+        var value = fn.$dv;
+        // Only if we have $dv do we iterate over all, otherwise it is just the first element.
+        var jj = (value === undefined) ? Math.min(this.length, 1) : this.length;
+        for (var j = 0; j < jj; j++) {
+          var nodeValue = fn(this[j], arg1, arg2);
+          value = value ? value + nodeValue : nodeValue;
+        }
+        return value;
+      }
+    } else {
+      // we are a write, so apply to all children
+      for (i = 0; i < this.length; i++) {
+        fn(this[i], arg1, arg2);
+      }
+      // return self for chaining
+      return this;
+    }
+  };
+
+var fn = function jqLiteData(element, key, value) {
+  var data = jqLiteExpandoStore(element, 'data'),
+      isSetter = isDefined(value),
+      keyDefined = !isSetter && isDefined(key),
+      isSimpleGetter = keyDefined && !isObject(key);
+
+  if (!data && !isSimpleGetter) {
+    jqLiteExpandoStore(element, 'data', data = {});
+  }
+
+  if (isSetter) {
+    data[key] = value;
+  } else {
+    if (keyDefined) {
+      if (isSimpleGetter) {
+        // don't create data in this case.
+        return data && data[key];
+      } else {
+        extend(data, key);
+      }
+    } else {
+      return data;
+    }
+  }
+}
+
+
+
+function jqLiteExpandoStore(element, key, value) {
+  var expandoId = element[jqName],
+      expandoStore = jqCache[expandoId || -1];
+      // 获取值
+  if (isDefined(value)) {
+    if (!expandoStore) {
+        // dom元素上面, 有'ng-xxx' = 2;
+      element[jqName] = expandoId = jqNextId();
+      // jqCache[2] = {}, 给jqCache设置属性，对于一个对象
+      expandoStore = jqCache[expandoId] = {};
+    }
+    expandoStore[key] = value;
+  } else {
+    return expandoStore && expandoStore[key];
+  }
+}
+
+// 通过dom元素，找到对象属性
+jqCache[element[jqName]] =>做反射; 知道对象的属性名，找属性值
+
+最后的结果
+jQCache[element['ng-xxx']]  = {
+    'data' : {
+        '$injector' : injector
+    }
+}

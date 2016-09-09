@@ -1,0 +1,43 @@
+function doBootStrap(){
+	var injector = createInjector(modules);
+	injector.invoke(['$rootScope', function($rootScope){
+		// $rootScope = this.$get的返回值，是一个scope实例
+	}])
+}
+
+
+
+function getService(name){
+	instanceCache['$exception'] = this.$get;
+	instanceCache['$parse'] = this.$get;
+	instanceCache['$browser'] = this.$get;
+	if(cache.hasOwnProperty(name)){
+		return cache[name]
+	}else{
+
+		//cache['$exceptionHandler'] = function(exception, cause) {
+      		//$log.error.apply($log, arguments);
+    	//};
+		return cache[name] = factory(name);
+	}
+}
+
+function invoke(fn, self){
+	var $injectors = anonate(fn);
+	var args = [];
+	for(var i=0; i<$injectors.length; i++){
+		var $injector = $injectors[i];
+		// $exceptionHandler
+		args.push(getService(name));
+	}
+	fn.apply(self, args);
+}
+
+function factory(name){
+	var provider = providerInjector.get(name + 'provider');
+	// 这里会进行一个很递归类型的调用。其中设计到的服务有$injector, $exceptionHandler, $parse, $browser
+	provider.invoke(provider.$get, provider);
+}
+
+
+//instanceCache中的服务都是this.$get的返回值

@@ -1,0 +1,120 @@
+how 增加{{age}}指令
+{{age}}
+
+function collectDirectives(node, direcitives, attrs){
+    var nodeType = node.nodeType;
+    switch(nodeType){
+        case 3:
+            addTextInterpolateDirective(directives, node.nodeValue);
+            break;
+    }
+}
+
+
+
+
+
+
+function addTextInterpolateDirective(directives, text) {
+  var interpolateFn = $interpolate(text, true);
+  if (interpolateFn) {
+    directives.push({
+      priority: 0,
+      compile: return function() {return function textInterpolateLinkFn(scope, node) {
+        var parent = node.parent(),
+            bindings = parent.data('$binding') || [];
+        bindings.push(interpolateFn);
+        safeAddClass(parent.data('$binding', bindings), 'ng-binding');
+        scope.$watch(interpolateFn, function interpolateFnWatchAction(value) {
+          node[0].nodeValue = value;
+        });
+      };}
+    });
+  }
+}
+
+
+
+function $interpolateProvider(){
+  this.$get = function(){}
+   parts.push(fn = $parse(exp = text.substring(startIndex + startSymbolLength, endIndex)));
+   fn = function(context) {}
+   fn.exp = text;
+   fn.parts = parts;
+   return fn;
+}
+
+// 解析的服务的写法
+function $parseProvider(){
+  this.$get = ['$filter', function ('$filter'){
+    return function(exp){
+        var lexer = new Lexer($parseOptions);
+        var parser = new Parser(lexer, $filter, $parseOptions);
+        parsedExpression = parser.parse(exp, false);
+        return parsedExpression;
+    }
+  }]
+}
+
+function Parser(lexer, $filter, $parseOtions){
+  this.lexer = lexer;
+  this.$filter = $filter;
+  this.options = $parseOtions;
+}
+
+Parser.prototype = {
+  parse : function(text, boolean){
+    var fn = function(self, locals) {
+        return (getter(self, locals));
+      }
+    fn.constant = false;
+    fn.literal = false;    
+
+    return fn;
+  }
+}
+
+
+function applyDirectivesToNode(){
+  linkFn = directive.compile($compileNode, templateAttrs, childTranscludeFn);
+  addLinkFns(null, linkFn, attrStart, attrEnd);
+}
+
+linkFn = function textInterpolateLinkFn(scope, node) {
+        var parent = node.parent(),
+            bindings = parent.data('$binding') || [];
+        bindings.push(interpolateFn);
+        safeAddClass(parent.data('$binding', bindings), 'ng-binding');
+        scope.$watch(interpolateFn, function interpolateFnWatchAction(value) {
+          node[0].nodeValue = value;
+        });
+      }
+
+function addLinkFns(pre, post, attrStart, attrEnd){
+    if (post) {
+      if (attrStart) post = groupElementsLinkFnWrapper(post, attrStart, attrEnd);
+      post.require = directive.require;
+      if (newIsolateScopeDirective === directive || directive.$$isolateScope) {
+        post = cloneAndAnnotateFn(post, {isolateScope: true});
+      }
+      postLinkFns.push(post);
+    }  
+}
+
+
+执行nodeLinkFn
+
+for(var i=0; i<postLinkFns.length; i++){
+    linkFn = postLinkFns[i];
+  linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs,
+      linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn);
+}
+
+调用linkFn函数
+interpolateFn ->$interpolateProvider服务的$get的返回值fn
+scope.$watch(interpolateFn, function interpolateFnWatchAction(value) {
+  node[0].nodeValue = value;
+});
+
+
+

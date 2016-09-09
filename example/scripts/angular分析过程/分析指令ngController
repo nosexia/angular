@@ -1,0 +1,177 @@
+分析自定义属性
+1.
+angularModule['ng', ['ngLocale'], ['$provider', function($provider){
+	// $provider ->providerCache.$provider
+
+	//执行的结果providerCache.$compileProvider = function $compileProvider的实例，指向所有的this属性。
+	providerCache.$compileProvider = {
+		directive : function registerDirective(){}
+	}
+	$provider.provider('$compile', $compileProvider);
+
+	// 执行结果providerCache.ngControllerDirectiveProvider = {
+		$get : ['$injector', '$exceptionHandler',function($injector, $exceptionHandler){}]
+	}
+	.directive('ngController', ngControllerProvider);
+
+	
+}]]
+
+function $compileProvider(){}的$injector指向$providerInjector
+function  $compileProvider中的 this.$get的$injector指向instanceInjector;
+
+
+function registerDirective(){
+	// 加入指令hasDirectives['ngController'] = [];
+	hasDirectives[name] = [];
+	// $provider指向 $providerCache.$provider
+	$provide.factory(name + Suffix, ['$injector', '$exceptionHandler',function($injector, $exceptionHandler){})]
+}
+
+function factory(name, factoryFn){
+	return provider(name, {$get : factory})
+}
+
+function provider(name, factoryFn){
+	providerCache[name + 'provider'] = factoryFn
+}
+
+
+2.
+在doBootStrap中
+instanceCache.invoke(['$compile', function($compile){
+	// instanceCache[$compile] = this.$get的放回值， function compile(){//}
+}])
+
+function invoke(name){
+	var $injectors = anonate(name);
+	for(var i=0; i<$injectors.length; i++){
+		// 注入的$injectors实在providerCache.injector对象。
+	}
+	getService(name);
+}
+
+function getService(cache, factory){
+	if(){
+
+	}else{
+		cache[name] = factory(name)
+	}
+}
+
+
+function factory(name){
+	var provider = providerInjector.get(name + 'Provider');
+	return instanceInjector.invoke(provider.$get, provider);
+}
+
+3.
+// 执行到
+$compile.$apply(element)
+
+下面有addDirective, 检查调用那些默认的指令
+// 拿ngController为例子
+addDirective(directives, nName, 'A', maxPriority, ignoreDirective, attrStartName,attrEndName);
+// 获取对应的指令值
+// 前面在执行第一1步，有
+providerCache.ngControllerDirectiveProvider = {$get : ['$injector', '$exception', function($injector, $exception){}]}
+
+// directives = [{
+	priority : 500,
+	index : 1,
+	directive : ngController,
+	require : ngController,
+	restrict : 'A',
+	controller: '@',
+	scope: true,
+	name : 'ngController'
+}]
+// $injector === instanceInjector
+directives = $injector.get('ngController' + 'Directive');
+
+function getService(cache, factory){
+	if(){
+
+	}else{
+	instanceCache.ngControllerDirective = [{
+	priority : 500,
+	index : 1,
+	directive : ngController,
+	require : ngController,
+	restrict : 'A',
+	controller: '@',
+	scope: true,
+	name : 'ngController'
+
+}];
+		return cache[name] = factory(name)
+	}
+}
+
+function factory(name){
+	// 得到providerInjector.下面的指令
+	var provider = providerInjector.get(name + 'Provider');
+	// 指向对象的$get方法
+	return instanceInjector.invoke(provider.$get, provider);
+}
+
+// $injector就是providerInjector对象
+['$injector', '$exceptionHandler',
+          function($injector, $exceptionHandler) {
+            var directives = [];
+            forEach(hasDirectives[name], function(directiveFactory, index) {
+
+              try {
+                var directive = $injector.invoke(directiveFactory);
+                if (isFunction(directive)) {
+                  directive = { compile: valueFn(directive) };
+                } else if (!directive.compile && directive.link) {
+                  directive.compile = valueFn(directive.link);
+                }
+                directive.priority = directive.priority || 0;
+                directive.index = index;
+                directive.name = directive.name || name;
+                directive.require = directive.require || (directive.controller && directive.name);
+                directive.restrict = directive.restrict || 'A';
+                directives.push(directive);
+              } catch (e) {
+                $exceptionHandler(e);
+              }
+            });
+            return directives;
+          }]
+
+
+var ngControllerDirective = [function() {
+  return {
+    scope: true,
+    controller: '@',
+    priority: 500
+  };
+}];
+
+
+// 得出结论
+1.providerCache.ngControllerDirectiveProvider = {
+	$get : ['$injector', '$exceptionHandler',function($injector, $exceptionHandler){}]
+}
+
+2.instanceCache.ngControllerDirective = [{
+	priority : 500,
+	index : 1,
+	directive : ngController,
+	require : ngController,
+	restrict : 'A',
+	controller: '@',
+}];
+
+
+3.function $compileProvider(){}的$injector指向$providerInjector
+4.function  $compileProvider中的 this.$get的$injector指向instanceInjector;
+
+
+
+
+
+
+

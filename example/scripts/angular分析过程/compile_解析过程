@@ -1,0 +1,57 @@
+// compile服务解析过程
+
+
+
+
+var injector = createInjector(modules);
+injector.invoke(['$rootScope', '$compile', '$rootElement', function($rootScope, $compile, $rootElement){
+	// 执行之后的结果为instanceCache['$rootScope'] = this.$get的返回值,
+	instanceCache['$compile'] = this.$get = function compile(){};
+	instanceCache['$rootElement'] = element;
+	compile(element)
+}])
+
+function createInjector(){
+	var providerCache = {
+		$provider : {
+			provider : supportObject(provider),
+			factory :　supportObject(factory),
+			value : supportObject(value),
+		}
+	}
+
+	var providerInjector = providerCache.injector(providerCahce, function(){
+
+	});
+
+	var instanceCache = {};
+	var instanceInjector = instanceCache.injector = createInternalInjector(instanceCache, function(name){
+		// 为{$get : ['$injector', '$exception', function($injector, $exception){}]}
+		var provider = providerInjector.get(name);
+		// 通过这里调用，所有的服务都是指向
+		return instanceInjector.invoke(provider.$get, provider);
+	})
+}
+
+
+function createInternalInjector(name, factory){
+	function getService(name){
+		if(cache.hasOwnProperty(name)){
+
+		}else{
+			cache[name] = factory(name);
+		}
+
+	}
+
+	function invoke(fn, self){
+		$injectors = anoonate(fn);
+		var args = [];
+		for(var i=0; i<$injectors.length; i++){
+			var $injector = $injectors[i];
+			args.push(getService(name))
+		}
+
+		fn.apply(self, args);
+	}
+}

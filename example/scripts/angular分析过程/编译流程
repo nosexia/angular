@@ -1,0 +1,115 @@
+instanceInjector.invoke(['$rootScope', '$compile', '$rootElement', function($scope, $compile, element){
+    // 调用的结果是函数compositeLinkFn函数
+    $compile(element);
+}])
+
+
+function compile(){
+      var compositeLinkFn =
+          compileNodes($compileNodes, transcludeFn, $compileNodes,
+                       maxPriority, ignoreDirective, previousCompileContext);
+        if (compositeLinkFn) compositeLinkFn(scope, $linkNode, $linkNode);
+}
+
+function compileNodes(element){
+    var attrs = new Attributes();
+    var linkFns = [];
+    for(var i=0; i<element.length; i++){
+        var node = element[i];
+        var directives = collectDirectives(node, [], attrs, ...);
+        var nodeLinkFn = (!directives.length) ? null : applyDirectivesToNode(direcitves, node);
+        var childLinkFn = (关于是否是最后一个元素？) ? null, compileNodes(node.childNode);
+        linkFns.push(nodeLinkFn, childLinkFn)
+    }
+    return compositeLinkFn;
+    function compositeLinkFn(scope, nodeList){
+        var i =0;
+        var nodeLinkFn = linkFns[i++];
+        var childLinkFn = linkFns[i++];
+        nodeLinkFn(childLinkFn, childScope, node, $rootElement, boundTranscludeFn);
+    }
+    
+}
+
+function applyDirectivesToNode(directives, node){
+    for(var i=0; i<directives.length; i++){
+        var directive = directives[i];
+        if(directiveValue = directive.scope){
+            newScopeDirective = newScopeDirective ||  directive;
+        }
+
+        if(!directive.templateUrl && directive.controller){
+            directiveValue = directive.controller;
+            controllerDirectives = controllerDirectives || {};
+            controllerDirectives[directiveName] = directive;
+        }
+    }
+    nodeLinkFn.scope = newScopeDirective && newScopeDirective.scope === true;
+    nodeLinkFn.transclude = hasTranscludeDirective && childTranscludeFn;
+    return nodeLinkFn;
+    function nodeLinkFn(childLinkFn, scope, linkNode){
+
+        attrs = shallowCopy(templateAttrs, new Attributes(jqLite(linkNode), templateAttrs.$attr));
+        forEach(controllerDirectives, function(directive) {
+            var locals = {
+              $scope: directive === newIsolateScopeDirective || directive.$$isolateScope ? isolateScope : scope,
+              $element: $element,
+              $attrs: attrs,
+              $transclude: transcludeFn
+            }, controllerInstance;
+
+            controller = directive.controller;
+            if (controller == '@') {
+              // controller = 'indexController'
+              controller = attrs[directive.name];
+            }
+            // Contruction类的一个实例，没有任何属性
+            controllerInstance = $controller(controller, locals);
+            // For directives with element transclusion the element is a comment,
+            // but jQuery .data doesn't support attaching data to comment nodes as it's hard to
+            // clean up (http://bugs.jquery.com/ticket/8335).
+            // Instead, we save the controllers for the element in a local hash and attach to .data
+            // later, once we have the actual element.
+            
+            elementControllers[directive.name] = controllerInstance;
+            if (!hasElementTranscludeDirective) {
+              $element.data('$' + directive.name + 'Controller', controllerInstance);
+            }
+          });
+        // 执行
+        childLinkFn && childLinkFn(scopeToChild, linkNode.childNodes, undefined, boundTranscludeFn);
+    }
+}
+
+
+// 执行compositeLinkFn，第一次是compile(element)(scope)->compositeLinkFn(scope, $linkNode, $linkNode);;
+// 执行compositeLinkFn，第二次执行实在nodeLinkFn中， childLinkFn && childLinkFn(scopeToChild, linkNode.childNodes, undefined, boundTranscludeFn);
+如果complieNodes函数在执行中node元素的字迹中也存在指令， 那么继续调用compositeLinkFn
+
+
+
+子作用域中的函数，
+childLinkFn(scopeToChild, linkNode.childNodes, undefined, boundTranscludeFn);，
+
+childLinkFn就是对于compileNodes(子元素执行的结果)->compositeLinkFn函数，
+
+此时的linkFns指向一个10个子集的数组。
+
+// 此时的childLinkFn，就是{{age}}指令执行applyDirectivesToNode的结果->nodeLinkFn
+// childScope为父及的作用域
+// node -> '{{age}}';
+在子集中调用compositeLinkFn方法时， 执行nodeLinkFn(childLinkFn, childScope, node, $rootElement, boundTranscludeFn);
+
+
+directives.push({
+  priority: 0,
+  compile: valueFn(function textInterpolateLinkFn(scope, node) {
+    var parent = node.parent(),
+        bindings = parent.data('$binding') || [];
+    bindings.push(interpolateFn);
+    safeAddClass(parent.data('$binding', bindings), 'ng-binding');
+    scope.$watch(interpolateFn, function interpolateFnWatchAction(value) {
+      node[0].nodeValue = value;
+    });
+  })
+});

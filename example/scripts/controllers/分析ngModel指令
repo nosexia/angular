@@ -1,0 +1,245 @@
+ng-model指令和input指令绑定， 给input表单绑定input事件和change事件
+同事设置指令对于的值，最后进行作用域下面变量的脏值检查
+1.
+function collectDirective(){        
+        attrsMap = attrs.$attr,
+       // 给input增加指令
+      addDirective(directives, directiveNormalize(nodeName_(node).toLowerCase()), 'E', maxPriority, ignoreDirective);
+      for (var attr, name, nName, ngAttrName, value, nAttrs = node.attributes,
+                   j = 0, jj = nAttrs && nAttrs.length; j < jj; j++) {
+            nName = directiveNormalize(name.toLowerCase());
+            attrsMap[nName] = name;
+            // 给ng-model增加指令
+            addDirective(directives, nName, 'A', maxPriority, ignoreDirective, attrStartName,
+                    attrEndName);
+        }
+
+}
+
+function (tDirectives){
+    directives = $injector.get(name + Suffix);
+    directive = directives[i];
+    tDirectives.push(directive);
+}
+
+var inputDirective = ['$browser', '$sniffer', function($browser, $sniffer) {
+  return {
+    name : 'input',
+    require: '?ngModel',
+    restrict: 'E',
+    link: function(scope, element, attr, ctrl) {
+      if (ctrl) {
+        (inputType[lowercase(attr.type)] || inputType.text)(scope, element, attr, ctrl, $sniffer,
+                                                            $browser);
+      }
+    },
+    compile : functoin(){        
+        return link;
+    },
+    priority : 0,
+  };
+}];
+
+
+var ngModelDirective = function() {
+  return {
+    name ：'ngModel',
+    require: ['ngModel', '^?form'],
+    controller: NgModelController,
+    priority : 0,
+    complie : function(){ return link  },
+    link: function(scope, element, attr, ctrls) {
+      // notify others, especially parent forms
+      var modelCtrl = ctrls[0],
+          formCtrl = ctrls[1] || nullFormCtrl;
+
+      formCtrl.$addControl(modelCtrl);
+
+      scope.$on('$destroy', function() {
+        formCtrl.$removeControl(modelCtrl);
+      });
+    }
+  };
+};
+
+
+directives中含有[inputDirective, ngModelDirective]这两个指令
+
+2.
+function applyDirectivesToNode(){
+    // 执行指令的循环， 执行inputDirective
+    for(var i = 0, ii = directives.length; i < ii; i++) {
+        linkFn = directive.compile($compileNode, templateAttrs, childTranscludeFn);
+        // postLinkFns.push(linkFn)
+        addLinkFns(null, linkFn, attrStart, attrEnd);
+    }
+
+    // 执行ngModelDirective
+    for(var i = 0, ii = directives.length; i < ii; i++) {
+        directiveName = directive.name;
+        // 指令中，带有controller属性
+        if (!directive.templateUrl && directive.controller) {
+            // 指令值，对于指令的控制器的值
+            directiveValue = directive.controller;
+            controllerDirectives = controllerDirectives || {};
+            // controllerDirectives.ngModel = ngModelDirective;
+            controllerDirectives[directiveName] = directive;
+        }
+        linkFn = directive.compile($compileNode, templateAttrs, childTranscludeFn);
+        // postLinkFns.push(linkFn)
+        addLinkFns(null, linkFn, attrStart, attrEnd);
+    }
+}
+
+3.
+function nodeLinkFn(){
+    // 指令中带有controller属性
+    if (controllerDirectives) {
+        var locals = {
+          $scope: directive === newIsolateScopeDirective || directive.$$isolateScope ? isolateScope : scope,
+          $element: $element,
+          $attrs: attrs,
+          $transclude: transcludeFn
+        }
+    }
+    controller = directive.controller;
+    // 获取NgModelControllre的实例, 在作用域下面增加一个watch监听，详见$watch
+    controllerInstance = $controller(controller, locals);
+    elementControllers.ngModel = controllerInstance;
+    elementControllers[directive.name] = controllerInstance;
+    if (!hasElementTranscludeDirective) {
+        jqCache[element[jqName]].data = {
+            '$ngModelController' : controllerInstance
+        }
+        $element.data('$' + directive.name + 'Controller', controllerInstance);
+    }
+
+    // 操作postLinkFns, 执行ngModel上的linkFn函数
+    for(i = postLinkFns.length - 1; i >= 0; i--) {
+      try {
+        linkFn = postLinkFns[i];
+        linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs,
+            linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn);
+      } catch (e) {
+        $exceptionHandler(e, startingTag($element));
+      }
+    }
+
+    // 操作postLinkFns， 执行input的link函数
+    for(i = postLinkFns.length - 1; i >= 0; i--) {
+      try {
+        linkFn = postLinkFns[i];
+        // linkFn.require = '?ngModel'
+        // getControllers的返回函数为NgModelController的实例
+        linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs,
+            linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn);
+      } catch (e) {
+        $exceptionHandler(e, startingTag($element));
+      }
+    }
+}
+
+4.调用getControllers
+function getControllers(require){
+    // 递归require数组，require为‘ngModel’, 返回的结果是NgModelController的实例
+    forEach(require, function(require) {
+        value.push(getControllers(require, $element, elementControllers));
+    });
+
+    
+    value = value || $element[retrievalMethod]('$' + 'form' + 'Controller');
+    // 递归require数组，require为‘^?form’, 
+    forEach(require, function(require) {
+        value.push(getControllers(require, $element, elementControllers));
+    });
+
+    最后返回的value为[NgModelController, undefined]
+}
+
+5.执行ngModel指令的linkFn函数, 没有干啥
+function(scope, element, attr, ctrls) {
+  // notify others, especially parent forms
+  var modelCtrl = ctrls[0],
+      formCtrl = ctrls[1] || nullFormCtrl;
+
+  formCtrl.$addControl(modelCtrl);
+
+  scope.$on('$destroy', function() {
+    formCtrl.$removeControl(modelCtrl);
+  });
+}
+
+
+执行input指令的linkFn函数
+function(scope, element, attr, ctrl) {
+  if (ctrl) {
+    // 执行textInputType函数
+    (inputType[lowercase(attr.type)] || inputType.text)(scope, element, attr, ctrl, $sniffer,
+                                                        $browser);
+  }
+}
+
+function textInputType (scope, element, attr, ctrl, $sniffer, $browser) {
+    // 给element绑定input, change事件
+    element.on('input', listener);
+    element.on('change', listener);
+    ctrl.$render = function() {
+        element.val(ctrl.$isEmpty(ctrl.$viewValue) ? '' : ctrl.$viewValue);
+    };
+}
+
+// 执行的结果在element上绑定了input事件
+// 给scope上面增加一个关于ngModelWatch监听
+
+
+
+// 执行脏值检测$rootScope.degist
+    // $attr.ngModel = 'value';
+  var ngModelGet = $parse($attr.ngModel),
+      ngModelSet = ngModelGet.assign;
+  $scope.$watch(function ngModelWatch() {
+    // 此时获取value值为haha
+    var value = ngModelGet($scope);
+
+    // if scope model value and ngModel value are out of sync
+    if (ctrl.$modelValue !== value) {
+
+      var formatters = ctrl.$formatters,
+          idx = formatters.length;
+
+      ctrl.$modelValue = value;
+      while(idx--) {
+        value = formatters[idx](value);
+      }
+
+      if (ctrl.$viewValue !== value) {
+      // 要不要渲染，取决于ctrl.$viewValue的值
+        // ctrl.$viewValue = 'hahah'
+        ctrl.$viewValue = value;
+        // 执行渲染
+        ctrl.$render();
+      }
+    }
+
+    return value;
+  });
+
+ctrl.$render = function() {
+    // 给element赋值操作
+    element.val(ctrl.$isEmpty(ctrl.$viewValue) ? '' : ctrl.$viewValue);
+};
+
+触发element的input事件， 执行listener函数
+  var listener = function() {
+    scope.$apply(function() {
+        // 执行完成ctrl之后，进行脏值检测
+      ctrl.$setViewValue(value);
+    });
+  };
+
+function $setViewValue(value){
+    // 脏值还没有设置成功，把$viewValue的值，先设置为当前的value值, 这部分的操作是很快的，没有设计到dom操作
+    this.$viewValue = value;
+    // 给属性value设置值
+    ngModelSet($scope, value);
+}

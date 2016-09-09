@@ -1,0 +1,44 @@
+//1.
+angularModule('ng', ['ngLocale'], ['$provider', function($provider){
+    $provider.provider($controller, $controllerProvider);
+}]);
+
+provider = providerInjector.get(invokeArgs[0]);     
+// 通过这里绑定的指令，存在$providerCache。
+provider[invokeArgs[1]].apply(provider, invokeArgs[2]);
+
+//设置到angularModule加载模块的，第三个参数中的所有依赖$provider指向providerCache.$provider;
+
+//执行结果
+providerCache['$controllerProvider'] = {
+    register : register
+    $get : ['$injector', '$window', function($injector, $window) {}]
+}
+
+
+2.执行绑定的控制器    
+var myApp = angular.module('myApp', []);
+myApp.controller('indexController', indexController);
+
+执行的结果：
+instanceModule = {
+    _invokeQueue : ['$controllerProvider', register, ['indexController', indexController]];
+}
+
+3.加载模块时候，function loadModules(){}
+var provider = providerInjetor.get('$controllerProvider');
+// 执行行数register
+provider['register'].apply(provider, invokeArgs[2]);
+function $ControllerProvider(){
+    var controllers = {};
+
+    this.register = function(name, contructor){
+        // 最终的结果
+        controllers['indexController'] = indexController;
+    }
+
+}
+
+
+
+

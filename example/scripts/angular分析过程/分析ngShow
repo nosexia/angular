@@ -1,0 +1,103 @@
+var ngShowDirective = ['$animate', function($animate) {
+  return function(scope, element, attr) {
+    scope.$watch(attr.ngShow, function ngShowWatchAction(value){
+      $animate[toBoolean(value) ? 'removeClass' : 'addClass'](element, 'ng-hide');
+    });
+  };
+}];
+
+ngShowDirective = [
+    compile : function(){
+        return function(scope, element, attr) {
+            scope.$watch(attr.ngShow, function ngShowWatchAction(value){
+              $animate[toBoolean(value) ? 'removeClass' : 'addClass'](element, 'ng-hide');
+        });
+    },
+    priority : 0,
+    index : 0,
+    name : ngShow,
+    require : undefined,
+    restrict : 'A',
+]
+
+function applyDirectivesToNode(){
+    linkFn = directive.compile($compileNode, templateAttrs, childTranscludeFn);
+
+    function nodeLinkFn(){
+        attrs = templateAttrs;
+        // attrs = {
+            $attrs : {},
+            $element : jqLite(element),
+            ngShow : 'value'
+        }
+    }
+    linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs,
+    linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn);
+}
+
+// 在在scope下面新加入一个$watch
+function(scope, element, attr) {
+    scope.$watch('value', function ngShowWatchAction(value){
+      $animate[toBoolean(value) ? 'removeClass' : 'addClass'](element, 'ng-hide');
+
+    // 执行的结果是：
+    $scope.$$watcher = {
+        get : fn,
+        exp : 'value'
+        listener : 
+    }
+});
+
+
+function $watch(){
+    get = compileToFn(watchExp, 'watch'),
+}
+
+
+function compileToFn(exp, name) {
+  var fn = $parse(exp);
+}
+
+function readIdent(){
+    var getter = getterFn(ident, this.options, this.text);
+    // 最终的fn
+    var fn = function(self, locals) {
+        return (getter(self, locals));
+      }
+}
+
+function simpleGetterFn1(key0, fullExp) {
+  ensureSafeMemberName(key0, fullExp);
+
+  return function simpleGetterFn1(scope, locals) {
+    if (scope == null) return undefined;
+    return ((locals && locals.hasOwnProperty(key0)) ? locals : scope)[key0];
+  };
+}
+
+getter = function simpleGetterFn1(scope, locals) {
+    if (scope == null) return undefined;
+    return ((locals && locals.hasOwnProperty(key0)) ? locals : scope)[key0];
+  };
+
+
+// 进行脏值检查
+function $digest(){
+    // 获取当前值
+    (value = watch.get(current))
+
+    function ngShowWatchAction(value){
+        // 做一层反射
+      $animate['removeClass'](element, 'ng-hide');
+    }
+}
+
+      removeClass : function(element, className, done) {
+        className = isString(className) ?
+                      className :
+                      isArray(className) ? className.join(' ') : '';
+        forEach(element, function (element) {
+          jqLiteRemoveClass(element, className);
+        });
+        done && $timeout(done, 0, false);
+      },

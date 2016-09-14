@@ -5523,7 +5523,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
           $compileNodes[index] = node = jqLite(node).wrap('<span></span>').parent()[0];
         }
       });
-      // 这个函数相当复杂，解析Nodes->收集指令->
+      // 这个函数相当复杂，解析Nodes->收集指令
       var compositeLinkFn =
               compileNodes($compileNodes, transcludeFn, $compileNodes,
                            maxPriority, ignoreDirective, previousCompileContext);
@@ -5538,7 +5538,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         forEach(transcludeControllers, function(instance, name) {
           $linkNode.data('$' + name + 'Controller', instance);
         });
-
         // Attach scope only to non-text nodes.
         for(var i = 0, ii = $linkNode.length; i<ii; i++) {
           var node = $linkNode[i],
@@ -5604,6 +5603,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         if (nodeLinkFn && nodeLinkFn.scope) {
           safeAddClass(jqLite(nodeList[i]), 'ng-scope');
         }
+
         childLinkFn = (nodeLinkFn && nodeLinkFn.terminal ||
                       !(childNodes = nodeList[i].childNodes) ||
                       !childNodes.length)
@@ -5623,7 +5623,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         // copy nodeList so that linking doesn't break due to live list updates.
         var nodeListLength = nodeList.length,
 
-            stableNodeList = new Array(nodeListLength);
+        stableNodeList = new Array(nodeListLength);
         for (i = 0; i < nodeListLength; i++) {
           stableNodeList[i] = nodeList[i];
         }
@@ -5659,7 +5659,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     function createBoundTranscludeFn(scope, transcludeFn) {
       return function boundTranscludeFn(transcludedScope, cloneFn, controllers) {
         var scopeCreated = false;
-
         if (!transcludedScope) {
           transcludedScope = scope.$new();
           transcludedScope.$$transcluded = true;
@@ -5892,10 +5891,8 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               controllerDirectives[directiveName], directive, $compileNode);
           controllerDirectives[directiveName] = directive;
         }
-
         if (directiveValue = directive.transclude) {
           hasTranscludeDirective = true;
-
           // Special case ngIf and ngRepeat so that we don't complain about duplicate transclusion.
           // This option should only be used by directives that know how to how to safely handle element transclusion,
           // where the transcluded nodes are added or replaced after linking.
@@ -5913,7 +5910,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
                                               templateAttrs[directiveName] + ' '));
             compileNode = $compileNode[0];
             replaceWith(jqCollection, jqLite(sliceArgs($template)), compileNode);
-
             childTranscludeFn = compile($template, transcludeFn, terminalPriority,
                                         replaceDirective && replaceDirective.name, {
                                           // Don't pass in:
@@ -6075,10 +6071,10 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
       function nodeLinkFn(childLinkFn, scope, linkNode, $rootElement, boundTranscludeFn) {
         var attrs, $element, i, ii, linkFn, controller, isolateScope, elementControllers = {}, transcludeFn;
-
         if (compileNode === linkNode) {
           attrs = templateAttrs;
-        } else {  
+        } else { 
+
           attrs = shallowCopy(templateAttrs, new Attributes(jqLite(linkNode), templateAttrs.$attr));
         }
         // attr = {

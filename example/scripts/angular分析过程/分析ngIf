@@ -1,0 +1,244 @@
+var ngIfDirective = ['$animate', function($animate) {
+  return {
+    transclude: 'element',
+    priority: 600,
+    terminal: true,
+    restrict: 'A',
+    $$tlb: true,
+    link: function ($scope, $element, $attr, ctrl, $transclude) {
+        var block, childScope;
+        $scope.$watch($attr.ngIf, function ngIfWatchAction(value) {
+
+          if (toBoolean(value)) {
+            if (!childScope) {
+              childScope = $scope.$new();
+              $transclude(childScope, function (clone) {
+                clone[clone.length++] = document.createComment(' end ngIf: ' + $attr.ngIf + ' ');
+                // Note: We only need the first/last node of the cloned nodes.
+                // However, we need to keep the reference to the jqlite wrapper as it might be changed later
+                // by a directive with templateUrl when it's template arrives.
+                block = {
+                  clone: clone
+                };
+                $animate.enter(clone, $element.parent(), $element);
+              });
+            }
+          } else {
+
+            if (childScope) {
+              childScope.$destroy();
+              childScope = null;
+            }
+
+            if (block) {
+              $animate.leave(getBlockElements(block.clone));
+              block = null;
+            }
+          }
+        });
+    }
+  };
+}];
+
+1. 应用指令到元素
+function applyDirectiveToNode(){
+    if (directiveValue == 'element') {
+      hasElementTranscludeDirective = true;
+      // 加高权重terminalPriority
+      terminalPriority = directive.priority;
+      // div元素
+      $template = groupScan(compileNode, attrStart, attrEnd);
+      tempalteAttrs的$$element属性指向注释元素
+      $compileNode = templateAttrs.$$element =
+          jqLite(document.createComment(' ' + directiveName + ': ' +
+                                        templateAttrs[directiveName] + ' '));
+      compileNode = $compileNode[0];
+      // 在jqCollect中删除template元素，增加compileNode元素
+      replaceWith(jqCollection, jqLite(sliceArgs($template)), compileNode);
+      // 最终结果执行compile的返回函数->publicLinkFn
+      childTranscludeFn = compile($template, transcludeFn, terminalPriority,
+                                  replaceDirective && replaceDirective.name, {
+                                    // Don't pass in:
+                                    // - controllerDirectives - otherwise we'll create duplicates controllers
+                                    // - newIsolateScopeDirective or templateDirective - combining templates with
+                                    //   element transclusion doesn't make sense.
+                                    //
+                                    // We need only nonTlbTranscludeDirective so that we prevent putting transclusion
+                                    // on the same element more than once.
+                                    nonTlbTranscludeDirective: nonTlbTranscludeDirective
+                                  });
+        }
+        // transclude属性执行->publicLinkFn
+        nodeLinkFn.transclude = hasTranscludeDirective && childTranscludeFn;  
+}
+
+2.元素的绑定函数link
+function compositeLinkFn(){
+    childTranscludeFn = nodeLinkFn.transclude;
+    if (childTranscludeFn || (!boundTranscludeFn && transcludeFn)) {
+      // 执行这里
+      nodeLinkFn(childLinkFn, childScope, node, $rootElement,
+        // 执行的结果为
+        createBoundTranscludeFn(scope, childTranscludeFn || transcludeFn)
+      );
+    } else {
+      nodeLinkFn(childLinkFn, childScope, node, $rootElement, boundTranscludeFn);
+    }  
+}
+
+2.1
+createBoundTranscludeFn函数的执行结果
+function boundTranscludeFn(transcludedScope, cloneFn, controllers) {
+    var scopeCreated = false;
+    if (!transcludedScope) {
+      transcludedScope = scope.$new();
+      transcludedScope.$$transcluded = true;
+      scopeCreated = true;
+    }
+
+    var clone = transcludeFn(transcludedScope, cloneFn, controllers);
+    if (scopeCreated) {
+      clone.on('$destroy', bind(transcludedScope, transcludedScope.$destroy));
+    }
+    return clone;
+  };
+
+3.执行nodeLinkFn函数
+function nodeLinkFn(childLinkFn, scope, linkNode, $rootElement, boundTranscludeFn){
+  // 指向注释元素
+  $element = attrs.$$element;
+  // 指向controllersBoundTransclude函数
+  transcludeFn = boundTranscludeFn && controllersBoundTransclude;
+  linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs,
+    linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn);
+}
+
+4. 执行指令的linkFn函数
+function ($scope, $element, $attr, ctrl, $transclude) {
+    var block, childScope;
+    $scope.$watch($attr.ngIf, function ngIfWatchAction(value) {
+
+      if (toBoolean(value)) {
+        if (!childScope) {          
+          childScope = $scope.$new();
+          $transclude(childScope, function (clone) {
+            clone[clone.length++] = document.createComment(' end ngIf: ' + $attr.ngIf + ' ');
+            // Note: We only need the first/last node of the cloned nodes.
+            // However, we need to keep the reference to the jqlite wrapper as it might be changed later
+            // by a directive with templateUrl when it's template arrives.
+            block = {
+              clone: clone
+            };
+            $animate.enter(clone, $element.parent(), $element);
+          });
+        }
+      } else {
+
+        if (childScope) {
+          childScope.$destroy();
+          childScope = null;
+        }
+
+        if (block) {
+          $animate.leave(getBlockElements(block.clone));
+          block = null;
+        }
+      }
+});
+
+5.调用$watch方法, 把fn, listener作为watcher的参数，放入scope.$$watcher中，这个是哦互的socpe还是ngController对于的scope
+function $watch(){
+    watcher = {
+      fn: listener,
+      last: initWatchVal,
+      get: get,
+      exp: watchExp,
+      eq: !!objectEquality
+    };
+    scope.$$watchers.unshift(watcher);
+}
+
+
+6.最后进行脏值检测
+function digest(){
+  // 获取当前指作用域下面的属性
+  value = watch.get(current);
+  watch.fn(value, ((last === initWatchVal) ? value : last), current);
+}
+
+7.执行ngIfWatchAction函数， 当有值的场景
+function ngIfWatchAction(value) {
+
+  if (toBoolean(value)) {
+    if (!childScope) {
+      // 第一次有值
+      childScope = $scope.$new();
+      $transclude(childScope, function (clone) {
+        clone[clone.length++] = document.createComment(' end ngIf: ' + $attr.ngIf + ' ');
+        // Note: We only need the first/last node of the cloned nodes.
+        // However, we need to keep the reference to the jqlite wrapper as it might be changed later
+        // by a directive with templateUrl when it's template arrives.
+        block = {
+          clone: clone
+        };
+        $animate.enter(clone, $element.parent(), $element);
+      });
+    }
+  } else {
+
+    if (childScope) {
+      childScope.$destroy();
+      childScope = null;
+    }
+
+    if (block) {
+      $animate.leave(getBlockElements(block.clone));
+      block = null;
+    }
+  }
+
+7.1此时的$transclude为
+function controllersBoundTransclude(){
+    if (hasElementTranscludeDirective) {
+      transcludeControllers = elementControllers;
+    }
+
+    return boundTranscludeFn(scope, cloneAttachFn, transcludeControllers);
+}
+
+7.2执行boundTranscludeFn
+boundTranscludeFn(transcludedScope, cloneFn, controllers) {
+  var scopeCreated = false;
+  if (!transcludedScope) {
+    transcludedScope = scope.$new();
+    transcludedScope.$$transcluded = true;
+    scopeCreated = true;
+  }
+
+  var clone = transcludeFn(transcludedScope, cloneFn, controllers);
+  if (scopeCreated) {
+    clone.on('$destroy', bind(transcludedScope, transcludedScope.$destroy));
+  }
+  return clone;
+};
+
+7.3执行transcludeFn = >publicLinkFn
+function publicLinkFn(scope, cloneConnectFn, transcludeControllers){
+    // 最后执行
+    if (cloneConnectFn) cloneConnectFn($linkNode, scope);
+}
+
+8执行cloneConnectFn
+// clone为div元素
+// $element为注释元素,
+function (clone) {
+      clone[clone.length++] = document.createComment(' end ngIf: ' + $attr.ngIf + ' ');
+      // Note: We only need the first/last node of the cloned nodes.
+      // However, we need to keep the reference to the jqlite wrapper as it might be changed later
+      // by a directive with templateUrl when it's template arrives.
+      block = {
+        clone: clone
+      };
+      // 把clone放入到$element.parent中。
+      $animate.enter(clone, $element.parent(), $element);
+    })

@@ -11,6 +11,11 @@ define([
         // defer.resolve();
 
         // $timeout.cancel(timeoutPromise);
-        $scope.value = 'hahha';
+        $scope.value = '1';
+
+        setTimeout(function(){
+            $scope.value = 0;
+            $rootScope.$digest();
+        });
     }];
 });

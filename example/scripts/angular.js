@@ -1229,7 +1229,6 @@ function angularInit(element, bootstrap) {
   function append(element) {
     element && elements.push(element);
   }
-
   forEach(names, function(name) {
     names[name] = true;
     append(document.getElementById(name));
@@ -1296,11 +1295,6 @@ function bootstrap(element, modules) {
       $provide.value('$rootElement', element);
     }]);
     modules.unshift('ng');
-    /*
-    modules = ['ng', ['$provide', function($provide) {
-      $provide.value('$rootElement', element);
-    }], 'myApp']
-    */
     // 绑定默认的指令，和控制器在providerCache对象下。就是注入了服务名称。
     var injector = createInjector(modules);
     // injector返回值是instanceCache.$compile === 
@@ -19141,7 +19135,6 @@ var ngRepeatDirective = ['$parse', '$animate', function($parse, $animate) {
               block,       // last object information {scope, element, id}
               nextBlockOrder = [],
               elementsToRemove;
-
 
           if (isArrayLike(collection)) {
             collectionKeys = collection;

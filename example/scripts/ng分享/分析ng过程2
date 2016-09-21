@@ -1,0 +1,20 @@
+function(scope, element, compile, injector, animate) {
+    scope.$apply(function() {
+      element.data('$injector', injector);
+      compile(element)(scope);
+    });
+  }]
+);
+
+1 scope.$apply解析, 执行expr函数
+// scope =>对于$rootScope
+// 重点函数compile, 对指令的分析
+// 主要执行从html元素中搜集指令，并且把指令中对于的变量绑定到对于$scope.$$wather上
+this.$eval(expr)
+
+
+
+2 进行脏值检测, 从$rootScope.$$watcher->$scope.$$watcher,检查所有的$$watcher值,
+如果变量有改变，将重新赋值，并且执行listener函数
+$rootScope.$digest();
+

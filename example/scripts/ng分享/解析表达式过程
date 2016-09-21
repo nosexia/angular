@@ -1,0 +1,25 @@
+// ng的解析服务
+function $parse(exp){
+    switch(typeof exp){
+        case 'string':
+        // lexer.options = $parseOptions;(词法分析器)
+        var lexer = new Lexer($parseOptions);
+
+        // parse.lexer = lexer;
+        // parse.$filter = $filter;
+        // parse.options = $parseOptions;
+        var parser = new Parser(lexer, $filter, $parseOptions);
+        // 解析exp表达式
+        parsedExpression = parser.parse(exp, false);
+}
+
+// 会对表达式的各种解析，
+parser.parse(exp, false)
+
+会执行到
+// 解析表达式文本，是否标识符，'.', '='号的情况
+this.token = this.lexer.lex(text);
+
+value = token.fn;
+// 对表达式进行一些运算（所以在指令中的运算，并不是js坏境的运算）
+var value = json ? this.primary() : this.statements();            //value 对于token.fn引用

@@ -1,0 +1,50 @@
+// 注入指令和服务到providerCache对象
+
+
+1.执行ng文件
+publishExternalAPI， 扩展bootstrap方法到angular对象下
+
+
+2.执行app.js入口文件
+// 加入'myApp'模块到modules中, 返回值是myApp的instanceModule对象
+instanceModule.controller =  invokeLater('$controllerProvider', 'register')
+instanceModule._invokeQueue = invokeQueue;
+var myApp = angular.module('myApp', []);
+// 调用controller方法
+// 增加执行队列invokeQueue[insertMethod || 'push']([provider, method, arguments]);
+myApp.controller('indexController', indexController);
+
+3 执行main.js的回调
+angular.bootstrap(document.body, ['myApp']);
+
+3.1 执行bootstrap函数
+
+var injector = createInjector(modules);
+
+3.2 执行createInjector方法
+forEach(loadModules(modulesToLoad), function(fn) { instanceInjector.invoke(fn || noop); });
+
+3.3执行loadModules方法
+// 递归执行moduleFn.requires模块， 加载所有的模块
+runBlocks = runBlocks.concat(loadModules(moduleFn.requires)).concat(moduleFn._runBlocks);
+for(invokeQueue = moduleFn._invokeQueue, i = 0, ii = invokeQueue.length; i < ii; i++) {
+    // 注册器的名称'$injector'
+    var invokeArgs = invokeQueue[i],          
+    // provider = > providerInjector
+    // providerInjector.invoke = invoke 执行被传递的参数
+    provider = providerInjector.get(invokeArgs[0]);         // invokeArgs[0] = >注册器名称
+
+    // 执行$controllerProvider函数, providerCache
+    // invokeArgs[1]执行注册器中的register方法( 创建新的控制器名称 )
+    provider[invokeArgs[1]].apply(provider, invokeArgs[2]);
+}
+
+3.3.1 controllers['indexController'] = fn
+this.register = function(name, constructor) {
+    assertNotHasOwnProperty(name, 'controller');
+    if (isObject(name)) {
+      extend(controllers, name);
+    } else {
+      controllers[name] = constructor;
+    }
+};

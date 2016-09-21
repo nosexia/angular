@@ -1,0 +1,54 @@
+详解双相绑定过程，在执行app.js中
+controllers['indexController'] = ['$rootScope', '$scope', '$timeout', '$q', function($rootScope, $scope, $timeout, $q){
+    $scope.name = 'nose';
+}];
+
+1.解析ng-Controller="indexController"指令
+执行上面的依赖注入name属性加入到$scope对象中
+
+
+2.解析html视图{{name}}指令
+把name变量加入到scope.$$wather的对象中
+
+
+function $watch(watchExp, listener, objectObject){
+        get = compileToFn(watchExp, 'watch'),
+        var watcher = {
+            listener : listener,
+            get : get,
+            exp : watcherExp,
+            last : initWatchVal,
+            eqeqeq : !!objectObject
+        }
+    // 重点
+    scope.unshift(watcher);
+}
+
+// get源码对应,采用了先注入name变量
+getterFnCache.age = function simpleGetterFn1(scope, locals) {
+    if (scope == null) return undefined;
+    // key[0]=>'age'
+    return ((locals && locals.hasOwnProperty(key0)) ? locals : scope)[key0];
+};
+
+token.fn = extend(function(self, locals) {
+    // 获取到作用域下面的name变量值
+    return (getter(self, locals));
+}, {
+    assign: function(self, value) {
+      return setter(self, ident, value, parser.text, parser.options);
+    }
+});
+
+// listener源码对应
+function interpolateFnWatchAction(value) {
+  node[0].nodeValue = value;
+}
+
+
+3.进行脏值检查，$rootScope->$scope下面的每一个属性有变化么，如果有又变量，执行$$wather.listener
+例如：检测$scope.name属性，
+// 当前$scope下面的name属性，是否和上一个watch.last值相等
+ if ((value = watch.get(current)) !== (last = watch.last)
+ // 不等，执行listener函数， 渲染ui。 
+  watch.fn(value, ((last === initWatchVal) ? value : last), current);

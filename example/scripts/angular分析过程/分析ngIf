@@ -242,3 +242,6 @@ function (clone) {
       // 把clone放入到$element.parent中。
       $animate.enter(clone, $element.parent(), $element);
     })
+
+// 首先删除ng对于的元素，元素最后进行脏值检测的时候，给深拷贝一个被删除的元素,
+// 会加入注释的元素<!-- ngIf : value -->  <!-- end ngIf : value-->

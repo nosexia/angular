@@ -1,0 +1,60 @@
+  ngRepeatDirective = {
+    name : 'ngRepeat'
+    transclude: 'element',
+    priority: 1000,
+    terminal: true,
+    $$tlb: true,
+    link: link
+  }
+
+  function applyDirectivesToNode(){
+      hasElementTranscludeDirective = true;
+      terminalPriority = directive.priority;
+      $template = groupScan(compileNode, attrStart, attrEnd);
+      $compileNode = templateAttrs.$$element =
+          jqLite(document.createComment(' ' + directiveName + ': ' +
+                                        templateAttrs[directiveName] + ' '));
+      compileNode = $compileNode[0];
+      replaceWith(jqCollection, jqLite(sliceArgs($template)), compileNode);
+      childTranscludeFn = compile($template, transcludeFn, terminalPriority,
+      replaceDirective && replaceDirective.name, {
+        // Don't pass in:
+        // - controllerDirectives - otherwise we'll create duplicates controllers
+        // - newIsolateScopeDirective or templateDirective - combining templates with
+        //   element transclusion doesn't make sense.
+        //
+        // We need only nonTlbTranscludeDirective so that we prevent putting transclusion
+        // on the same element more than once.
+        nonTlbTranscludeDirective: nonTlbTranscludeDirective
+      });
+  }
+  transcludeFn = boundTranscludeFn && controllersBoundTransclude;
+  linkFn(linkFn.isolateScope ? isolateScope : scope, $element, attrs,
+  linkFn.require && getControllers(linkFn.require, $element, elementControllers), transcludeFn);
+
+执行link函数
+var match = expression.match(/^\s*([\s\S]+?)\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?\s*$/),
+        // 'attr'
+        valueIdentifier = match[3] || match[1];
+        // 'obj'
+        keyIdentifier = match[2];
+// 执行$watchCollection
+$scope.$watchCollection(keyIdentifier)
+
+
+// 执行watchCollection函数
+var objGetter = $parse(obj);
+return this.$watch($watchCollectionWatch, $watchCollectionAction);
+
+最后还是执行$watch
+作为了参数做了scope.$$watcher的属性
+
+没什么好说的，最后脏值检查
+value = watch.get(current)) // =>[1 , 2];
+watch.fn(value, last current);
+
+watch.fn =   function $watchCollectionAction() {
+          listener(newValue, oldValue, self);
+        }
+
+listener为ngRepeatAction函数

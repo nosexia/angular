@@ -2,9 +2,14 @@ define([
     'angular'
 ],function(angular){
     var module = angular.module('moduleService', []);
-    module.factory('eat', function(){
-        return {
-            'name' : 'nose'
+    // 需要一个实例化对象，调用service方法
+    module.service('eat', function(){
+        this.eat = function(){
+
+        };
+
+        this.drink = function(){
+
         };
     });
 });

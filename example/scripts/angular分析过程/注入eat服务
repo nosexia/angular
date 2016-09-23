@@ -1,0 +1,14 @@
+invokeQueue[insertMethod || 'push']([provider, method, arguments]);
+
+
+return providerCache[name + providerSuffix] = provider_;
+
+providerCache.eatProvider = {
+    $get : function(){
+        return {
+            'name' : 'nose';
+        }
+    }
+};
+
+instanceCache.eat = providerCache.eatProvider.$get();

@@ -1,9 +1,7 @@
 define([
     
 ], function(){
-    return ['$rootScope', '$scope', '$timeout', '$q', function($rootScope, $scope, $timeout, $q){
-
-        $scope.name = 'nose';
-
+    return ['eat', function(eat){
+        console.log(eat);
     }];
 });

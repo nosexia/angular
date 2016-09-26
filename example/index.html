@@ -13,10 +13,11 @@
     </style>
 </head>
 
+<body>
+    <div ng-view></div>
 
-<body ng-controller="indexController">
-    {{name}}
-
+    <a href="#">默认值</a>
+    <a href="#/edit/100">编辑哈</a>
 </body>
 
 <script type="text/javascript">
@@ -25,7 +26,8 @@
         shim: {
             angular: {
                 exports: 'angular'
-            }
+            },
+            'angular-route' : ['angular']
         }
     };
 </script>

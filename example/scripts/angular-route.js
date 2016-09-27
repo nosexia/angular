@@ -153,7 +153,7 @@ function $RouteProvider(){
       route,
       path && pathRegExp(path, route)
     );
-
+    // path路径最后一个字符不是'/'的情况，需要做重定向
     // create redirection for trailing slashes
     if (path) {
       var redirectPath = (path[path.length-1] == '/')

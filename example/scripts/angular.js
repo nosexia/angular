@@ -11981,6 +11981,7 @@ function $RootScopeProvider(){
        *
        */
       $evalAsync: function(expr) {
+        debugger;
         // if we are outside of an $digest loop and this is the first time we are scheduling async
         // task also schedule async auto-flush
         if (!$rootScope.$$phase && !$rootScope.$$asyncQueue.length) {
@@ -11990,6 +11991,7 @@ function $RootScopeProvider(){
             }
           });
         }
+        debugger;
 
         this.$$asyncQueue.push({scope: this, expression: expr});
       },

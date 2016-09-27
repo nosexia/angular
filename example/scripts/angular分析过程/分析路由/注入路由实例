@@ -1,0 +1,8 @@
+var ngRouteModule = angular.module('ngRoute', ['ng']).
+                        provider('$route', $RouteProvider);
+创建ngRoute模块
+ng中本来不含有$route, $RouteProvider服务，
+$route, $RouteProvider是绑定到ngRoute模型上,
+ngRoute的invokeQueue指向一个数组['$provider', 'provider', ['$route', $RouteProvider]]
+
+providerCache.$routeProvider = $RouteProvider的实例
